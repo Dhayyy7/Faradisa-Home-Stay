@@ -1,18 +1,19 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>@yield('title', 'Admin Dashboard') - Faradisa HomeStay</title>
-    
+
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
+
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+
     <style>
         :root {
             --primary: #4f46e5;
@@ -115,7 +116,8 @@
             transition: all 0.2s ease;
         }
 
-        .nav-link:hover, .nav-link.active {
+        .nav-link:hover,
+        .nav-link.active {
             background-color: rgba(99, 102, 241, 0.15);
             color: #818cf8;
         }
@@ -243,6 +245,96 @@
             flex-grow: 1;
         }
 
+        /* Cards & Layout */
+        .card {
+            background-color: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: #0f172a;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Forms & Inputs */
+        .form-group {
+            margin-bottom: 1.15rem;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #334155;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-input, .form-textarea, .form-select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid #cbd5e1;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            outline: none;
+            background-color: #ffffff;
+            transition: border-color 0.2s;
+        }
+
+        .form-input:focus, .form-textarea:focus, .form-select:focus {
+            border-color: #4f46e5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+        }
+
+        .btn-submit {
+            background-color: #4f46e5;
+            color: #ffffff;
+            border: none;
+            padding: 0.75rem 1.25rem;
+            border-radius: 10px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-submit:hover {
+            background-color: #4338ca;
+        }
+
+        /* Data Tables */
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 0.9rem;
+        }
+
+        .data-table th {
+            background-color: #f8fafc;
+            padding: 0.875rem 1rem;
+            font-weight: 600;
+            color: #475569;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .data-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #f1f5f9;
+            color: #334155;
+        }
+
         /* Footer */
         .footer {
             padding: 1.25rem 2rem;
@@ -255,6 +347,7 @@
     </style>
     @yield('styles')
 </head>
+
 <body>
 
     <!-- Sidebar Navigation -->
@@ -277,21 +370,21 @@
 
             <div class="menu-category"> Pengelolaan </div>
             @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
-                <li class="nav-item">
-                    <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-bed"></i>
-                        <span>Kamar & Unit</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-list-check"></i>
-                        <span>Fasilitas</span>
-                    </a>
-                </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-bed"></i>
+                    <span>Kamar & Unit</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>Fasilitas</span>
+                </a>
+            </li>
             @endif
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-calendar-check"></i>
                     <span>Pemesanan</span>
                 </a>
@@ -305,18 +398,18 @@
 
             <div class="menu-category"> Sistem </div>
             @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
-                <li class="nav-item">
-                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-users-gear"></i>
-                        <span>User</span>
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
-                        <i class="fa-solid fa-user-shield"></i>
-                        <span>Role User</span>
-                    </a>
-                </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-users-gear"></i>
+                    <span>User</span>
+                </a>
+            </li>
+            <li class="nav-item">
+                <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-user-shield"></i>
+                    <span>Role User</span>
+                </a>
+            </li>
             @endif
             <li class="nav-item">
                 <a href="#" class="nav-link">
@@ -341,7 +434,7 @@
                     <div class="user-info">
                         <span class="user-name">{{ Auth::user()->name ?? 'Admin User' }}</span>
                         <span class="user-details">
-                            @ {{ Auth::user()->username ?? 'admin' }} 
+                            @ {{ Auth::user()->username ?? 'admin' }}
                             <span class="badge-role">{{ Auth::user()->role_user ?? 'Staff' }}</span>
                         </span>
                     </div>
@@ -360,30 +453,30 @@
         <!-- Dynamic Content -->
         <main class="content-area">
             @if(session('success'))
-                <div style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #bbf7d0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-circle-check"></i>
-                    {{ session('success') }}
-                </div>
+            <div style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #bbf7d0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-circle-check"></i>
+                {{ session('success') }}
+            </div>
             @endif
 
             @if(session('error'))
-                <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
-                    <i class="fa-solid fa-triangle-exclamation"></i>
-                    {{ session('error') }}
-                </div>
+            <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+                {{ session('error') }}
+            </div>
             @endif
 
             @if($errors->any())
-                <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem;">
-                    <strong style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
-                        <i class="fa-solid fa-triangle-exclamation"></i> Terjadi Kesalahan:
-                    </strong>
-                    <ul style="margin-left: 1.5rem;">
-                        @foreach($errors->all() as $err)
-                            <li>{{ $err }}</li>
-                        @endforeach
-                    </ul>
-                </div>
+            <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem;">
+                <strong style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i> Terjadi Kesalahan:
+                </strong>
+                <ul style="margin-left: 1.5rem;">
+                    @foreach($errors->all() as $err)
+                    <li>{{ $err }}</li>
+                    @endforeach
+                </ul>
+            </div>
             @endif
 
             @yield('content')
@@ -395,6 +488,77 @@
         </footer>
     </div>
 
+    <!-- SweetAlert2 CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        function confirmDelete(button, message = 'Apakah Anda yakin ingin menghapus data ini?') {
+            const form = button.closest('form');
+            Swal.fire({
+                title: 'Konfirmasi Hapus',
+                text: message,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc2626',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-trash-can"></i> Ya, Hapus',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'swal2-rounded-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        function confirmSubmit(form, message = 'Anda Yakin Akan Merubah Data ini?', title = 'Konfirmasi Perubahan') {
+            Swal.fire({
+                title: title,
+                text: message,
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#4f46e5',
+                cancelButtonColor: '#64748b',
+                confirmButtonText: '<i class="fa-solid fa-check"></i> Ya, Simpan',
+                cancelButtonText: 'Batal',
+                customClass: {
+                    popup: 'swal2-rounded-popup'
+                }
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+            return false;
+        }
+    </script>
+
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            title: 'Berhasil!',
+            text: "{{ session('success') }}",
+            icon: 'success',
+            confirmButtonColor: '#4f46e5',
+            timer: 3500
+        });
+    </script>
+    @endif
+
+    @if(session('error'))
+    <script>
+        Swal.fire({
+            title: 'Gagal!',
+            text: "{{ session('error') }}",
+            icon: 'error',
+            confirmButtonColor: '#dc2626'
+        });
+    </script>
+    @endif
+
     @yield('scripts')
 </body>
+
 </html>

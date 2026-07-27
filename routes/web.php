@@ -2,6 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\LoginController;
+use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\RoleController;
@@ -21,6 +22,12 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
     Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+
+    // Booking Management Routes (Accessible to Auth Users)
+    Route::get('/admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');
+    Route::post('/admin/bookings', [BookingController::class, 'store'])->name('admin.bookings.store');
+    Route::put('/admin/bookings/{booking}', [BookingController::class, 'update'])->name('admin.bookings.update');
+    Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])->name('admin.bookings.destroy');
     
     // Super Admin Only Routes
     Route::middleware(['superadmin'])->group(function () {

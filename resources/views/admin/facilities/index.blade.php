@@ -17,92 +17,6 @@
         }
     }
 
-    .card {
-        background-color: #ffffff;
-        border-radius: 16px;
-        border: 1px solid #e2e8f0;
-        box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
-    }
-
-    .card-title {
-        font-size: 1.1rem;
-        font-weight: 700;
-        color: #0f172a;
-        margin-bottom: 1.25rem;
-        display: flex;
-        align-items: center;
-        gap: 0.5rem;
-    }
-
-    .form-group {
-        margin-bottom: 1.15rem;
-    }
-
-    .form-label {
-        display: block;
-        font-size: 0.85rem;
-        font-weight: 600;
-        color: #334155;
-        margin-bottom: 0.4rem;
-    }
-
-    .form-input, .form-textarea {
-        width: 100%;
-        padding: 0.75rem 1rem;
-        border: 1px solid #cbd5e1;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        outline: none;
-        transition: border-color 0.2s;
-    }
-
-    .form-input:focus, .form-textarea:focus {
-        border-color: #4f46e5;
-        box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-    }
-
-    .btn-submit {
-        background-color: #4f46e5;
-        color: #ffffff;
-        border: none;
-        padding: 0.75rem 1.25rem;
-        border-radius: 10px;
-        font-size: 0.9rem;
-        font-weight: 600;
-        cursor: pointer;
-        display: inline-flex;
-        align-items: center;
-        gap: 0.5rem;
-        transition: background-color 0.2s;
-    }
-
-    .btn-submit:hover {
-        background-color: #4338ca;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-        font-size: 0.9rem;
-    }
-
-    .data-table th {
-        background-color: #f8fafc;
-        padding: 0.875rem 1rem;
-        font-weight: 600;
-        color: #475569;
-        border-bottom: 1px solid #e2e8f0;
-    }
-
-    .data-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #f1f5f9;
-        color: #334155;
-    }
-
     .facility-icon-badge {
         width: 36px;
         height: 36px;
@@ -115,7 +29,6 @@
         font-size: 1rem;
     }
 
-    /* Action Buttons */
     .action-btns {
         display: flex;
         align-items: center;
@@ -160,7 +73,6 @@
         background-color: #fca5a5;
     }
 
-    /* Modal Backdrop & Card */
     .modal-backdrop {
         position: fixed;
         inset: 0;
@@ -289,10 +201,10 @@
                                         <span>Edit</span>
                                     </button>
 
-                                    <form action="{{ route('admin.facilities.destroy', $f->id) }}" method="POST" onsubmit="return confirm('Apakah Anda yakin ingin menghapus fasilitas {{ $f->name }}?')">
+                                    <form action="{{ route('admin.facilities.destroy', $f->id) }}" method="POST">
                                         @csrf
                                         @method('DELETE')
-                                        <button type="submit" class="btn-delete">
+                                        <button type="button" class="btn-delete" onclick="confirmDelete(this, 'Apakah Anda yakin ingin menghapus fasilitas {{ $f->name }}?')">
                                             <i class="fa-solid fa-trash-can"></i>
                                             <span>Hapus</span>
                                         </button>
@@ -307,65 +219,11 @@
     </div>
 </div>
 
-<!-- Modal Edit Fasilitas -->
-<div class="modal-backdrop" id="editModal">
-    <div class="modal-card">
-        <div class="modal-header">
-            <h3 class="modal-title">Edit Fasilitas</h3>
-            <button type="button" class="btn-close-modal" onclick="closeEditModal()">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <form id="editForm" method="POST">
-            @csrf
-            @method('PUT')
-
-            <div class="form-group">
-                <label for="edit_name" class="form-label">Nama Fasilitas</label>
-                <input type="text" id="edit_name" name="name" class="form-input" required>
-            </div>
-
-            <div class="form-group">
-                <label for="edit_icon" class="form-label">Icon FontAwesome</label>
-                <input type="text" id="edit_icon" name="icon" class="form-input">
-            </div>
-
-            <div class="form-group">
-                <label for="edit_description" class="form-label">Deskripsi</label>
-                <textarea id="edit_description" name="description" rows="3" class="form-textarea"></textarea>
-            </div>
-
-            <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
-                <button type="button" class="btn-edit" style="background-color: #f1f5f9; color: #475569;" onclick="closeEditModal()">
-                    Batal
-                </button>
-                <button type="submit" class="btn-submit">
-                    <i class="fa-solid fa-save"></i>
-                    <span>Simpan Perubahan</span>
-                </button>
-            </div>
-        </form>
-    </div>
-</div>
+<!-- Modal Partials -->
+@include('admin.facilities.modals.edit')
 
 @endsection
 
 @section('scripts')
-<script>
-    function openEditModal(id, name, icon, description) {
-        const form = document.getElementById('editForm');
-        form.action = `/admin/facilities/${id}`;
-        
-        document.getElementById('edit_name').value = name;
-        document.getElementById('edit_icon').value = icon;
-        document.getElementById('edit_description').value = description;
-        
-        document.getElementById('editModal').classList.add('show');
-    }
-
-    function closeEditModal() {
-        document.getElementById('editModal').classList.remove('show');
-    }
-</script>
+@include('admin.facilities.scripts')
 @endsection

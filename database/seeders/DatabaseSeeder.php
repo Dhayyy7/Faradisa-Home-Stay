@@ -6,9 +6,11 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Room;
 use App\Models\Facility;
+use App\Models\Booking;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 
 class DatabaseSeeder extends Seeder
 {
@@ -82,11 +84,11 @@ class DatabaseSeeder extends Seeder
 
         // Seed sample rooms
         $room1 = Room::updateOrCreate(
-            ['code' => 'KMR-001'],
+            ['code' => 'P1V1'],
             [
-                'code' => 'KMR-001',
-                'name' => 'Deluxe Room #01',
-                'price' => 500000,
+                'code' => 'P1V1',
+                'name' => 'Paradisa 1 Vila 1',
+                'price' => 550000,
                 'discount' => 10.00, // 10% discount
                 'images' => [],
             ]
@@ -99,10 +101,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $room2 = Room::updateOrCreate(
-            ['code' => 'KMR-002'],
+            ['code' => 'P2V1'],
             [
-                'code' => 'KMR-002',
-                'name' => 'Family Suite #02',
+                'code' => 'P2V1',
+                'name' => 'Paradisa 2 Vila 1',
                 'price' => 850000,
                 'discount' => 15.00, // 15% discount
                 'images' => [],
@@ -118,10 +120,10 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $room3 = Room::updateOrCreate(
-            ['code' => 'KMR-003'],
+            ['code' => 'P2V2'],
             [
-                'code' => 'KMR-003',
-                'name' => 'Standard Room #03',
+                'code' => 'P2V2',
+                'name' => 'Paradisa 2 Vila 2',
                 'price' => 350000,
                 'discount' => null, // no discount
                 'images' => [],
@@ -131,5 +133,27 @@ class DatabaseSeeder extends Seeder
             $facilityModels['AC (Air Conditioner)']->id,
             $facilityModels['Wi-Fi Gratis 100Mbps']->id,
         ]);
+
+        // Seed sample booking
+        Booking::updateOrCreate(
+            ['booking_code' => 'P1V120260729'],
+            [
+                'room_id' => $room1->id,
+                'booking_code' => 'P1V120260729',
+                'customer_name' => 'Budi Santoso',
+                'customer_address' => 'Jl. Merdeka No. 45, Jakarta Selatan',
+                'customer_phone' => '081234567890',
+                'customer_sosmed' => '@budisantoso',
+                'check_in_date' => '2026-07-29',
+                'check_out_date' => '2026-07-31',
+                'total_nights' => 2,
+                'room_price' => 550000,
+                'discount' => 10.00,
+                'total_price' => 990000,
+                'status' => 1, // Pending (Menunggu Bayar WA 2 jam)
+                'expired_at' => Carbon::now()->addHours(2),
+                'extra_facilities' => null,
+            ]
+        );
     }
 }
