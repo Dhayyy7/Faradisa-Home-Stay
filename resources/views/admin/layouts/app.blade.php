@@ -269,19 +269,27 @@
         <ul class="sidebar-menu">
             <div class="menu-category"> Utama </div>
             <li class="nav-item">
-                <a href="{{ route('admin.dashboard') }}" class="nav-link active">
+                <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
                     <i class="fa-solid fa-chart-pie"></i>
                     <span>Dashboard</span>
                 </a>
             </li>
 
             <div class="menu-category"> Pengelolaan </div>
-            <li class="nav-item">
-                <a href="#" class="nav-link">
-                    <i class="fa-solid fa-bed"></i>
-                    <span>Kamar & Unit</span>
-                </a>
-            </li>
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
+                <li class="nav-item">
+                    <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-bed"></i>
+                        <span>Kamar & Unit</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-list-check"></i>
+                        <span>Fasilitas</span>
+                    </a>
+                </li>
+            @endif
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fa-solid fa-calendar-check"></i>
@@ -296,6 +304,20 @@
             </li>
 
             <div class="menu-category"> Sistem </div>
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
+                <li class="nav-item">
+                    <a href="{{ route('admin.users.index') }}" class="nav-link {{ request()->routeIs('admin.users.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-users-gear"></i>
+                        <span>User</span>
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="{{ route('admin.roles.index') }}" class="nav-link {{ request()->routeIs('admin.roles.*') ? 'active' : '' }}">
+                        <i class="fa-solid fa-user-shield"></i>
+                        <span>Role User</span>
+                    </a>
+                </li>
+            @endif
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fa-solid fa-gear"></i>
@@ -341,6 +363,26 @@
                 <div style="background-color: #dcfce7; color: #166534; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #bbf7d0; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
                     <i class="fa-solid fa-circle-check"></i>
                     {{ session('success') }}
+                </div>
+            @endif
+
+            @if(session('error'))
+                <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem; display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fa-solid fa-triangle-exclamation"></i>
+                    {{ session('error') }}
+                </div>
+            @endif
+
+            @if($errors->any())
+                <div style="background-color: #fee2e2; color: #991b1b; padding: 1rem; border-radius: 12px; margin-bottom: 1.5rem; border: 1px solid #fca5a5; font-size: 0.9rem;">
+                    <strong style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Terjadi Kesalahan:
+                    </strong>
+                    <ul style="margin-left: 1.5rem;">
+                        @foreach($errors->all() as $err)
+                            <li>{{ $err }}</li>
+                        @endforeach
+                    </ul>
                 </div>
             @endif
 

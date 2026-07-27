@@ -4,6 +4,8 @@
 .env.backup
 .env.production
 .phpactor.json
+project.md
+/public/uploads/*
 .phpunit.result.cache
 /.codex
 /.cursor/
