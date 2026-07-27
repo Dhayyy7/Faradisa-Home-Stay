@@ -55,9 +55,22 @@
             </div>
 
             <div class="form-group">
+                <label class="form-label">Extra Fasilitas <span style="font-weight: 400; color: #64748b;">(Pilih Banyak / Opsional)</span></label>
+                <div class="facility-checkbox-grid">
+                    @foreach($extraFacilities as $ef)
+                    <label class="facility-checkbox-item">
+                        <input type="checkbox" name="extra_facility_ids[]" value="{{ $ef->id }}">
+                        <span>{{ $ef->name }} (+Rp {{ number_format($ef->price, 0, ',', '.') }})</span>
+                    </label>
+                    @endforeach
+                </div>
+            </div>
+
+            <div class="form-group">
                 <label for="status" class="form-label">Status Awal Pemesanan</label>
                 <select id="status" name="status" class="form-select">
                     <option value="1" selected>🟡 Pending (Menunggu Bayar WA - Kunci 2 Jam)</option>
+                    <option value="4">🟣 DP 50% (Panjar 50% - Terkonfirmasi Kunci)</option>
                     <option value="2">🟢 Lunas (Terkonfirmasi - Langsung Kunci)</option>
                 </select>
             </div>

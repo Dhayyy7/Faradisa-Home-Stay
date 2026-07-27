@@ -3,7 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login Admin - Faradisa HomeStay</title>
+    @php
+        $appSetting = \App\Models\Setting::getSetting();
+    @endphp
+
+    <title>Login Admin - {{ $appSetting->homestay_name ?? 'Faradisa HomeStay' }}</title>
+
+    <!-- Favicon Icon Tab Web -->
+    @if($appSetting->logo && file_exists(public_path($appSetting->logo)))
+        <link rel="icon" type="image/x-icon" href="/{{ $appSetting->logo }}">
+        <link rel="shortcut icon" href="/{{ $appSetting->logo }}">
+        <link rel="apple-touch-icon" href="/{{ $appSetting->logo }}">
+    @endif
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">

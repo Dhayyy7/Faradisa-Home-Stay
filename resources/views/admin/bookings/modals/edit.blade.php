@@ -16,6 +16,7 @@
                 <label for="edit_status" class="form-label">Status Pemesanan</label>
                 <select id="edit_status" name="status" class="form-select" required>
                     <option value="1">🟡 Pending (Menunggu Pembayaran / WA)</option>
+                    <option value="4">🟣 DP 50% (Panjar 50% - Terkonfirmasi)</option>
                     <option value="2">🟢 Lunas (Terkonfirmasi - Berhasil)</option>
                     <option value="3">🔵 Selesai (Completed - Check-Out)</option>
                     <option value="0">🔴 Dibatalkan / Expired (Kamar Bebas)</option>
@@ -60,6 +61,18 @@
                 <div class="form-group">
                     <label for="edit_check_out_date" class="form-label">Tanggal Check-Out</label>
                     <input type="date" id="edit_check_out_date" name="check_out_date" class="form-input" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Extra Fasilitas <span style="font-weight: 400; color: #64748b;">(Pilih Banyak / Opsional)</span></label>
+                <div class="facility-checkbox-grid">
+                    @foreach($extraFacilities as $ef)
+                    <label class="facility-checkbox-item">
+                        <input type="checkbox" class="edit-extra-facility-checkbox" name="extra_facility_ids[]" value="{{ $ef->id }}">
+                        <span>{{ $ef->name }} (+Rp {{ number_format($ef->price, 0, ',', '.') }})</span>
+                    </label>
+                    @endforeach
                 </div>
             </div>
 

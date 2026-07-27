@@ -33,6 +33,14 @@ class Room extends Model
     }
 
     /**
+     * Get the bookings for the room.
+     */
+    public function bookings()
+    {
+        return $this->hasMany(Booking::class);
+    }
+
+    /**
      * Calculate price after discount percentage.
      */
     public function getFinalPriceAttribute()

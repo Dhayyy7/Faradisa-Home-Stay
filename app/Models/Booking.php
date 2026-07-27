@@ -40,6 +40,7 @@ class Booking extends Model
             'check_out_date' => 'date',
             'expired_at' => 'datetime',
             'status' => 'integer',
+            'extra_facilities' => 'array',
         ];
     }
 
@@ -57,6 +58,7 @@ class Booking extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
+            4 => 'DP 50%',
             3 => 'Selesai (Completed)',
             2 => 'Lunas',
             1 => 'Menunggu Pembayaran (Pending)',
@@ -71,6 +73,7 @@ class Booking extends Model
     public function getStatusBadgeAttribute(): array
     {
         return match ($this->status) {
+            4 => ['label' => 'DP 50%', 'bg' => '#f3e8ff', 'color' => '#7e22ce', 'icon' => 'fa-coins'],
             3 => ['label' => 'Selesai', 'bg' => '#dbeafe', 'color' => '#1e40af', 'icon' => 'fa-flag-checkered'],
             2 => ['label' => 'Lunas', 'bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle-check'],
             1 => ['label' => 'Pending (WA)', 'bg' => '#fef3c7', 'color' => '#b45309', 'icon' => 'fa-clock'],

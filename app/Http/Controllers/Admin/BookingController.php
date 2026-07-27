@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use App\Models\Booking;
 use App\Models\Room;
+use App\Models\ExtraFacility;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 
@@ -20,8 +21,8 @@ class BookingController extends Controller
             ->where('expired_at', '<=', now())
             ->update(['status' => 0]);
 
-        // 2. Auto complete paid bookings whose check-out date has passed (Status 2 -> 3)
-        Booking::where('status', 2)
+        // 2. Auto complete paid/DP bookings whose check-out date has passed (Status 2, 4 -> 3)
+        Booking::whereIn('status', [2, 4])
             ->where('check_out_date', '<', date('Y-m-d'))
             ->update(['status' => 3]);
     }
@@ -29,14 +30,46 @@ class BookingController extends Controller
     /**
      * Display a listing of bookings.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->autoUpdateBookingStatuses();
 
-        $bookings = Booking::with('room')->latest()->get();
-        $rooms = Room::all();
+        $search = $request->input('search', $request->input('code'));
 
-        return view('admin.bookings.index', compact('bookings', 'rooms'));
+        $query = Booking::with('room')->latest();
+
+        if ($search) {
+            $query->where(function ($q) use ($search) {
+                $q->where('booking_code', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_name', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_phone', 'LIKE', "%{$search}%")
+                  ->orWhere('customer_address', 'LIKE', "%{$search}%")
+                  ->orWhereHas('room', function ($rq) use ($search) {
+                      $rq->where('name', 'LIKE', "%{$search}%")
+                        ->orWhere('code', 'LIKE', "%{$search}%");
+                  });
+
+                // Match status text keywords
+                $searchLower = strtolower($search);
+                if (str_contains('lunas', $searchLower)) {
+                    $q->orWhere('status', 2);
+                } elseif (str_contains('dp', $searchLower) || str_contains('50', $searchLower)) {
+                    $q->orWhere('status', 4);
+                } elseif (str_contains('pending', $searchLower) || str_contains('menunggu', $searchLower)) {
+                    $q->orWhere('status', 1);
+                } elseif (str_contains('selesai', $searchLower) || str_contains('completed', $searchLower)) {
+                    $q->orWhere('status', 3);
+                } elseif (str_contains('batal', $searchLower) || str_contains('expired', $searchLower)) {
+                    $q->orWhere('status', 0);
+                }
+            });
+        }
+
+        $bookings = $query->paginate(10);
+        $rooms = Room::all();
+        $extraFacilities = ExtraFacility::all();
+
+        return view('admin.bookings.index', compact('bookings', 'rooms', 'extraFacilities', 'search'));
     }
 
     /**
@@ -54,8 +87,9 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
-            'status' => ['nullable', 'integer', 'in:0,1,2,3'],
-            'extra_facilities' => ['nullable', 'string'],
+            'status' => ['nullable', 'integer', 'in:0,1,2,3,4'],
+            'extra_facility_ids' => ['nullable', 'array'],
+            'extra_facility_ids.*' => ['exists:extra_facilities,id'],
         ], [
             'room_id.required' => 'Pilih kamar terlebih dahulu.',
             'customer_name.required' => 'Nama pemesan wajib diisi.',
@@ -70,9 +104,9 @@ class BookingController extends Controller
         $checkInStr = $request->input('check_in_date');
         $checkOutStr = $request->input('check_out_date');
 
-        // Check availability for overlaps with active bookings (status 1 or 2)
+        // Check availability for overlaps with active bookings (status 1, 2, or 4)
         $isConflict = Booking::where('room_id', $roomId)
-            ->whereIn('status', [1, 2])
+            ->whereIn('status', [1, 2, 4])
             ->where(function ($q) {
                 $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
             })
@@ -106,7 +140,24 @@ class BookingController extends Controller
         $roomPrice = $room->price;
         $discount = $room->discount; // percent % from room if available, else null
         $finalPricePerNight = $room->final_price;
-        $totalPrice = $finalPricePerNight * $totalNights;
+        $roomTotalPrice = $finalPricePerNight * $totalNights;
+
+        // Process selected Extra Facilities
+        $selectedExtraIds = $request->input('extra_facility_ids', []);
+        $extraFacilitiesList = ExtraFacility::whereIn('id', $selectedExtraIds)->get();
+
+        $totalExtraPrice = 0;
+        $savedExtraFacilities = [];
+        foreach ($extraFacilitiesList as $ef) {
+            $totalExtraPrice += $ef->price;
+            $savedExtraFacilities[] = [
+                'id' => $ef->id,
+                'name' => $ef->name,
+                'price' => (float) $ef->price,
+            ];
+        }
+
+        $totalPrice = $roomTotalPrice + $totalExtraPrice;
 
         $status = $request->input('status', 1); // default 1 = Pending
         $expiredAt = ($status == 1) ? Carbon::now()->addHours(2) : null;
@@ -126,7 +177,7 @@ class BookingController extends Controller
             'total_price' => $totalPrice,
             'status' => $status,
             'expired_at' => $expiredAt,
-            'extra_facilities' => $request->input('extra_facilities'),
+            'extra_facilities' => $savedExtraFacilities,
         ]);
 
         return redirect()->route('admin.bookings.index')->with('success', 'Pemesanan baru berhasil disimpan dengan Kode: ' . $bookingCode);
@@ -147,8 +198,9 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
-            'status' => ['required', 'integer', 'in:0,1,2,3'],
-            'extra_facilities' => ['nullable', 'string'],
+            'status' => ['required', 'integer', 'in:0,1,2,3,4'],
+            'extra_facility_ids' => ['nullable', 'array'],
+            'extra_facility_ids.*' => ['exists:extra_facilities,id'],
         ], [
             'room_id.required' => 'Pilih kamar terlebih dahulu.',
             'customer_name.required' => 'Nama pemesan wajib diisi.',
@@ -165,11 +217,11 @@ class BookingController extends Controller
 
         $newStatus = (int) $request->input('status');
 
-        // If status is active (1 or 2), check for conflicts with OTHER active bookings
-        if (in_array($newStatus, [1, 2])) {
+        // If status is active (1, 2, or 4), check for conflicts with OTHER active bookings
+        if (in_array($newStatus, [1, 2, 4])) {
             $isConflict = Booking::where('room_id', $roomId)
                 ->where('id', '!=', $booking->id)
-                ->whereIn('status', [1, 2])
+                ->whereIn('status', [1, 2, 4])
                 ->where(function ($q) {
                     $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
                 })
@@ -207,7 +259,24 @@ class BookingController extends Controller
         $roomPrice = $room->price;
         $discount = $room->discount;
         $finalPricePerNight = $room->final_price;
-        $totalPrice = $finalPricePerNight * $totalNights;
+        $roomTotalPrice = $finalPricePerNight * $totalNights;
+
+        // Process selected Extra Facilities
+        $selectedExtraIds = $request->input('extra_facility_ids', []);
+        $extraFacilitiesList = ExtraFacility::whereIn('id', $selectedExtraIds)->get();
+
+        $totalExtraPrice = 0;
+        $savedExtraFacilities = [];
+        foreach ($extraFacilitiesList as $ef) {
+            $totalExtraPrice += $ef->price;
+            $savedExtraFacilities[] = [
+                'id' => $ef->id,
+                'name' => $ef->name,
+                'price' => (float) $ef->price,
+            ];
+        }
+
+        $totalPrice = $roomTotalPrice + $totalExtraPrice;
 
         // Manage expired_at: if changing to 1 (pending), extend 2 hours. If 2 (lunas), 3 (selesai) or 0 (batal), clear expired_at
         $expiredAt = $booking->expired_at;
@@ -232,7 +301,7 @@ class BookingController extends Controller
             'total_price' => $totalPrice,
             'status' => $newStatus,
             'expired_at' => $expiredAt,
-            'extra_facilities' => $request->input('extra_facilities'),
+            'extra_facilities' => $savedExtraFacilities,
         ]);
 
         return redirect()->route('admin.bookings.index')->with('success', 'Data pemesanan berhasil diperbarui!');
@@ -246,5 +315,18 @@ class BookingController extends Controller
         $booking->delete();
 
         return redirect()->route('admin.bookings.index')->with('success', 'Data pemesanan berhasil dihapus (Soft Delete)!');
+    }
+
+    /**
+     * Quick update booking status to Lunas (2).
+     */
+    public function markAsLunas(Booking $booking)
+    {
+        $booking->update([
+            'status' => 2,
+            'expired_at' => null,
+        ]);
+
+        return redirect()->route('admin.bookings.index')->with('success', 'Status pemesanan ' . $booking->booking_code . ' berhasil diubah menjadi LUNAS!');
     }
 }

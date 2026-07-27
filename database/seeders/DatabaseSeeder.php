@@ -6,7 +6,9 @@ use App\Models\User;
 use App\Models\Role;
 use App\Models\Room;
 use App\Models\Facility;
+use App\Models\ExtraFacility;
 use App\Models\Booking;
+use App\Models\Setting;
 use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\Hash;
@@ -64,6 +66,17 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        // Seed default settings
+        Setting::updateOrCreate(
+            ['id' => 1],
+            [
+                'logo' => null,
+                'homestay_name' => 'Faradisa HomeStay',
+                'wa_number' => '081234567890',
+                'media_assets' => [],
+            ]
+        );
+
         // Seed master facilities
         $facilities = [
             ['name' => 'AC (Air Conditioner)', 'icon' => 'fa-snowflake', 'description' => 'Pendingin ruangan dingin & sejuk.'],
@@ -79,6 +92,22 @@ class DatabaseSeeder extends Seeder
             $facilityModels[$f['name']] = Facility::updateOrCreate(
                 ['name' => $f['name']],
                 $f
+            );
+        }
+
+        // Seed Extra Facilities
+        $extraFacilities = [
+            ['name' => 'Extra Bed / Kasur Tambahan', 'price' => 75000, 'description' => 'Kasur lipat empuk + bantal & selimut.'],
+            ['name' => 'Handuk & Alat Mandi Ekstra', 'price' => 25000, 'description' => 'Set handuk bersih dan perlengkapan mandi.'],
+            ['name' => 'Sarapan Pagi Tambahan', 'price' => 35000, 'description' => 'Porsi sarapan prasmanan per orang.'],
+            ['name' => 'BBQ Grill Set & Arang', 'price' => 100000, 'description' => 'Peralatan memanggang Daging/Ikan + arang 2kg.'],
+            ['name' => 'Layanan Antar Jemput Bandara/Stasiun', 'price' => 150000, 'description' => 'Mobil AC bersih penjemputan tamu.'],
+        ];
+
+        foreach ($extraFacilities as $ef) {
+            ExtraFacility::updateOrCreate(
+                ['name' => $ef['name']],
+                $ef
             );
         }
 
@@ -149,10 +178,12 @@ class DatabaseSeeder extends Seeder
                 'total_nights' => 2,
                 'room_price' => 550000,
                 'discount' => 10.00,
-                'total_price' => 990000,
+                'total_price' => 1065000, // (495,000 * 2) + 75,000 (Extra Bed)
                 'status' => 1, // Pending (Menunggu Bayar WA 2 jam)
                 'expired_at' => Carbon::now()->addHours(2),
-                'extra_facilities' => null,
+                'extra_facilities' => [
+                    ['name' => 'Extra Bed / Kasur Tambahan', 'price' => 75000]
+                ],
             ]
         );
     }

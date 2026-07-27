@@ -5,6 +5,35 @@
 
 @section('styles')
 <style>
+    /* Checkbox Group for Extra Facilities */
+    .facility-checkbox-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+        gap: 0.6rem;
+        background: #f8fafc;
+        padding: 0.875rem;
+        border-radius: 12px;
+        border: 1px solid #e2e8f0;
+        max-height: 180px;
+        overflow-y: auto;
+    }
+
+    .facility-checkbox-item {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 0.825rem;
+        color: #334155;
+        cursor: pointer;
+    }
+
+    .facility-checkbox-item input[type="checkbox"] {
+        accent-color: #4f46e5;
+        width: 16px;
+        height: 16px;
+        cursor: pointer;
+    }
+
     .badge-code {
         background-color: #e0e7ff;
         color: #4338ca;
@@ -60,9 +89,75 @@
         margin: 0 auto;
     }
 
+    /* Custom Pagination Styling */
+    .pagination {
+        display: flex;
+        align-items: center;
+        gap: 0.35rem;
+        list-style: none;
+        margin: 0;
+        padding: 0;
+    }
+
+    .pagination li a,
+    .pagination li span {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        min-width: 34px;
+        height: 34px;
+        padding: 0 0.5rem;
+        border-radius: 8px;
+        font-size: 0.825rem;
+        font-weight: 600;
+        text-decoration: none;
+        color: #475569;
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        transition: all 0.2s ease;
+    }
+
+    .pagination li.active span {
+        background-color: #4f46e5;
+        color: #ffffff;
+        border-color: #4f46e5;
+    }
+
+    .pagination li a:hover {
+        background-color: #e0e7ff;
+        color: #4338ca;
+        border-color: #c7d2fe;
+    }
+
+    .pagination li.disabled span {
+        opacity: 0.4;
+        cursor: not-allowed;
+    }
+
     .action-btns form {
         width: 100%;
         margin: 0;
+    }
+
+    .btn-lunas {
+        background-color: #dcfce7;
+        color: #166534;
+        border: none;
+        padding: 0.35rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        transition: all 0.2s;
+        width: 100%;
+    }
+
+    .btn-lunas:hover {
+        background-color: #bbf7d0;
     }
 
     .btn-preview {
@@ -197,10 +292,30 @@
             <i class="fa-solid fa-list-check" style="color: #4f46e5;"></i>
             Daftar Pemesanan Homestay
         </h2>
-        <button type="button" class="btn-submit" onclick="openCreateBookingModal()">
-            <i class="fa-solid fa-calendar-plus"></i>
-            <span>Input Pemesanan Baru</span>
-        </button>
+
+        <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+            <!-- Search Form -->
+            <form action="{{ route('admin.bookings.index') }}" method="GET" style="display: flex; align-items: center; gap: 0.4rem;">
+                <div style="position: relative; display: flex; align-items: center;">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; color: #94a3b8; font-size: 0.8rem;"></i>
+                    <input type="text" name="search" class="form-input" placeholder="Cari kode, nama, hp, status..." value="{{ request('search', request('code')) }}" style="padding-left: 2.1rem; padding-right: 2rem; border-radius: 10px; width: 250px; font-size: 0.825rem; height: 38px;">
+                    @if(request('search') || request('code'))
+                        <a href="{{ route('admin.bookings.index') }}" style="position: absolute; right: 0.65rem; color: #94a3b8; text-decoration: none; font-size: 0.8rem;" title="Reset Pencarian">
+                            <i class="fa-solid fa-circle-xmark"></i>
+                        </a>
+                    @endif
+                </div>
+                <button type="submit" class="btn-submit" style="padding: 0 0.85rem; height: 38px; border-radius: 10px; background-color: #4f46e5; font-size: 0.825rem;">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <span>Cari</span>
+                </button>
+            </form>
+
+            <button type="button" class="btn-submit" onclick="openCreateBookingModal()" style="height: 38px; border-radius: 10px; font-size: 0.825rem;">
+                <i class="fa-solid fa-calendar-plus"></i>
+                <span>Input Pemesanan Baru</span>
+            </button>
+        </div>
     </div>
 
     <div style="overflow-x: auto;">
@@ -217,9 +332,9 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach($bookings as $index => $b)
-                <tr>
-                    <td>{{ $index + 1 }}</td>
+                @forelse($bookings as $index => $b)
+                <tr id="booking_row_{{ $b->booking_code }}" style="{{ request('code') == $b->booking_code ? 'background-color: #e0e7ff; border-left: 4px solid #4f46e5;' : '' }}">
+                    <td>{{ $bookings->firstItem() + $index }}</td>
                     <td>
                         <div><span class="badge-code">{{ $b->booking_code }}</span></div>
                         <div style="font-weight: 700; color: #1e293b; margin-top: 0.25rem;">
@@ -233,11 +348,11 @@
                         </div>
                     </td>
                     <td>
-                        <div style="font-size: 0.85rem; font-weight: 600; color: #334155;">
-                            {{ $b->check_in_date ? $b->check_in_date->format('d M Y') : '-' }}
+                        <div style="font-weight: 600; color: #334155; font-size: 0.85rem;">
+                            <i class="fa-solid fa-calendar-day" style="color: #4f46e5; font-size: 0.75rem;"></i> In: {{ $b->check_in_date->format('d/m/Y') }}
                         </div>
-                        <div style="font-size: 0.78rem; color: #64748b;">
-                            s/d {{ $b->check_out_date ? $b->check_out_date->format('d M Y') : '-' }} ({{ $b->total_nights }} mlm)
+                        <div style="font-weight: 600; color: #64748b; font-size: 0.85rem; margin-top: 0.15rem;">
+                            <i class="fa-solid fa-calendar-check" style="color: #64748b; font-size: 0.75rem;"></i> Out: {{ $b->check_out_date->format('d/m/Y') }} ({{ $b->total_nights }} malam)
                         </div>
                     </td>
                     <td>
@@ -252,13 +367,49 @@
                         @endif
                     </td>
                     <td>
-                        <div style="font-weight: 800; color: #16a34a;">Rp {{ number_format($b->total_price, 0, ',', '.') }}</div>
+                        @php
+                            $discountMultiplier = 1 - (($b->discount ?? 0) / 100);
+                            $roomSubtotal = ($b->room_price * $discountMultiplier) * $b->total_nights;
+                            
+                            $extraTotal = 0;
+                            if (is_array($b->extra_facilities)) {
+                                foreach ($b->extra_facilities as $ef) {
+                                    $extraTotal += $ef['price'] ?? 0;
+                                }
+                            }
+                        @endphp
+
+                        <div style="font-size: 0.78rem; color: #475569;">
+                            Kamar: <strong>Rp {{ number_format($roomSubtotal, 0, ',', '.') }}</strong>
+                        </div>
+
+                        @if($extraTotal > 0)
+                        <div style="font-size: 0.78rem; color: #4338ca;">
+                            Extra: <strong>+Rp {{ number_format($extraTotal, 0, ',', '.') }}</strong>
+                        </div>
+                        @endif
+
+                        <div style="font-weight: 800; color: #16a34a; font-size: 0.95rem; margin-top: 0.15rem;">
+                            Total: Rp {{ number_format($b->total_price, 0, ',', '.') }}
+                        </div>
+
                         @if($b->discount && $b->discount > 0)
-                            <div><span class="badge-discount-percent">{{ number_format($b->discount, 0) }}% OFF</span></div>
+                            <div style="margin-top: 0.1rem;"><span class="badge-discount-percent">{{ number_format($b->discount, 0) }}% OFF</span></div>
                         @endif
                     </td>
                     <td style="text-align: center;">
                         <div class="action-btns">
+                            @if($b->status == 1)
+                            <form action="{{ route('admin.bookings.mark-lunas', $b->id) }}" method="POST">
+                                @csrf
+                                @method('PATCH')
+                                <button type="button" class="btn-lunas" onclick="confirmSubmit(this.form, 'Apakah Anda yakin ingin langsung mengubah status booking {{ $b->booking_code }} menjadi LUNAS?', 'Konfirmasi Pelunasan')">
+                                    <i class="fa-solid fa-circle-check"></i>
+                                    <span>Lunas</span>
+                                </button>
+                            </form>
+                            @endif
+
                             <button type="button" class="btn-preview" onclick="openPreviewModal({{ json_encode($b) }}, {{ json_encode($b->room) }})">
                                 <i class="fa-solid fa-eye"></i>
                                 <span>Preview</span>
@@ -295,4 +446,23 @@
 
 @section('scripts')
 @include('admin.bookings.scripts')
+
+@if(request('code'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const targetRow = document.getElementById('booking_row_{{ request('code') }}');
+        if (targetRow) {
+            targetRow.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            @php
+                $targetBooking = $bookings->firstWhere('booking_code', request('code'));
+            @endphp
+            @if($targetBooking)
+                setTimeout(function() {
+                    openPreviewModal(@json($targetBooking), @json($targetBooking->room));
+                }, 300);
+            @endif
+        }
+    });
+</script>
+@endif
 @endsection

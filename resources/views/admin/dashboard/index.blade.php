@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
 @section('title', 'Dashboard Admin')
-@section('page_title', 'Ringkasan Dashboard')
+@section('page_title', 'Ringkasan Dashboard Analytics')
 
 @section('styles')
 <style>
@@ -23,6 +23,7 @@
         align-items: center;
         gap: 1.25rem;
         transition: transform 0.2s ease;
+        text-decoration: none;
     }
 
     .stat-card:hover {
@@ -37,12 +38,32 @@
         align-items: center;
         justify-content: center;
         font-size: 1.4rem;
+        position: relative;
     }
 
     .icon-indigo { background-color: #e0e7ff; color: #4f46e5; }
     .icon-emerald { background-color: #dcfce7; color: #16a34a; }
     .icon-amber { background-color: #fef3c7; color: #d97706; }
     .icon-rose { background-color: #ffe4e6; color: #e11d48; }
+
+    /* Red Dot Pulsing Notification Badge */
+    .notification-badge-dot {
+        position: absolute;
+        top: 2px;
+        right: 2px;
+        width: 14px;
+        height: 14px;
+        background-color: #ef4444;
+        border: 2px solid #ffffff;
+        border-radius: 50%;
+        animation: pulse-red 1.5s infinite;
+    }
+
+    @keyframes pulse-red {
+        0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+        70% { transform: scale(1.1); box-shadow: 0 0 0 8px rgba(239, 68, 68, 0); }
+        100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+    }
 
     .stat-details h3 {
         font-size: 0.8rem;
@@ -54,8 +75,8 @@
     }
 
     .stat-details .value {
-        font-size: 1.5rem;
-        font-weight: 700;
+        font-size: 1.4rem;
+        font-weight: 800;
         color: #0f172a;
     }
 
@@ -73,75 +94,37 @@
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-bottom: 1.25rem;
+        margin-bottom: 1.5rem;
+        flex-wrap: wrap;
+        gap: 1rem;
     }
 
     .card-title {
-        font-size: 1.1rem;
+        font-size: 1.15rem;
         font-weight: 700;
         color: #0f172a;
-    }
-
-    .btn-action {
-        background-color: #4f46e5;
-        color: #ffffff;
-        padding: 0.5rem 1rem;
-        border-radius: 10px;
-        font-size: 0.85rem;
-        font-weight: 600;
-        text-decoration: none;
-        display: inline-flex;
+        display: flex;
         align-items: center;
         gap: 0.5rem;
-        transition: background-color 0.2s ease;
     }
 
-    .btn-action:hover {
-        background-color: #4338ca;
-    }
-
-    /* Data Table */
-    .table-container {
-        overflow-x: auto;
-    }
-
-    .data-table {
-        width: 100%;
-        border-collapse: collapse;
-        text-align: left;
-        font-size: 0.9rem;
-    }
-
-    .data-table th {
+    .form-select-filter {
+        padding: 0.5rem 1rem;
+        border-radius: 10px;
+        border: 1px solid #cbd5e1;
         background-color: #f8fafc;
-        padding: 0.875rem 1rem;
+        font-size: 0.875rem;
         font-weight: 600;
-        color: #475569;
-        border-bottom: 1px solid #e2e8f0;
+        color: #1e293b;
+        outline: none;
+        cursor: pointer;
+        transition: all 0.2s;
     }
 
-    .data-table td {
-        padding: 1rem;
-        border-bottom: 1px solid #f1f5f9;
-        color: #334155;
+    .form-select-filter:focus {
+        border-color: #4f46e5;
+        background-color: #ffffff;
     }
-
-    .data-table tr:last-child td {
-        border-bottom: none;
-    }
-
-    .badge-status {
-        padding: 0.25rem 0.65rem;
-        border-radius: 20px;
-        font-size: 0.75rem;
-        font-weight: 600;
-        display: inline-block;
-    }
-
-    .status-confirmed { background-color: #dbeafe; color: #1e40af; }
-    .status-pending { background-color: #fef3c7; color: #92400e; }
-    .status-checked-in { background-color: #dcfce7; color: #166534; }
-    .status-completed { background-color: #f1f5f9; color: #475569; }
 </style>
 @endsection
 
@@ -149,16 +132,18 @@
 
     <!-- KPI Stat Cards -->
     <div class="stats-grid">
+        <!-- Card 1: Total Kamar -->
         <div class="stat-card">
             <div class="stat-icon icon-indigo">
                 <i class="fa-solid fa-bed"></i>
             </div>
             <div class="stat-details">
-                <h3>Total Kamar</h3>
+                <h3>Total Kamar & Unit</h3>
                 <div class="value">{{ $stats['total_rooms'] }} Unit</div>
             </div>
         </div>
 
+        <!-- Card 2: Pemesanan Aktif -->
         <div class="stat-card">
             <div class="stat-icon icon-emerald">
                 <i class="fa-solid fa-calendar-check"></i>
@@ -169,77 +154,186 @@
             </div>
         </div>
 
+        <!-- Card 3: Pendapatan Bulan Ini -->
         <div class="stat-card">
             <div class="stat-icon icon-amber">
                 <i class="fa-solid fa-chart-line"></i>
             </div>
             <div class="stat-details">
                 <h3>Pendapatan Bulan Ini</h3>
-                <div class="value">Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}</div>
+                <div class="value" id="monthly_revenue_display">Rp {{ number_format($stats['monthly_revenue'], 0, ',', '.') }}</div>
             </div>
         </div>
 
-        <div class="stat-card">
+        <!-- Card 4: Booking Pending Notification -->
+        <a href="{{ route('admin.bookings.index') }}" class="stat-card">
             <div class="stat-icon icon-rose">
-                <i class="fa-solid fa-percent"></i>
+                <i class="fa-solid fa-bell"></i>
+                @if($stats['pending_count'] > 0)
+                    <span class="notification-badge-dot"></span>
+                @endif
             </div>
             <div class="stat-details">
-                <h3>Tingkat Hunian</h3>
-                <div class="value">{{ $stats['occupancy_rate'] }}%</div>
+                <h3>Booking Pending</h3>
+                @if($stats['pending_count'] > 0)
+                    <div class="value" style="color: #dc2626;">{{ $stats['pending_count'] }} Pemesanan</div>
+                    <div style="font-size: 0.72rem; color: #dc2626; font-weight: 700; margin-top: 0.15rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-triangle-exclamation"></i> Kunci 2 Jam - Perlu Cek
+                    </div>
+                @else
+                    <div class="value" style="color: #16a34a;">0 Pending</div>
+                    <div style="font-size: 0.72rem; color: #16a34a; font-weight: 600; margin-top: 0.15rem; display: flex; align-items: center; gap: 0.3rem;">
+                        <i class="fa-solid fa-circle-check"></i> Tidak Ada Antrean
+                    </div>
+                @endif
             </div>
-        </div>
+        </a>
     </div>
 
-    <!-- Recent Bookings Section -->
+    <!-- Section Grafik Pemesanan Homestay (Grouped Bar Chart: Lunas vs Dibatalkan) -->
     <div class="card">
         <div class="card-header">
-            <h2 class="card-title">Pemesanan Terbaru</h2>
-            <a href="#" class="btn-action">
-                <i class="fa-solid fa-plus"></i>
-                <span>Tambah Pemesanan</span>
-            </a>
+            <div>
+                <h2 class="card-title">
+                    <i class="fa-solid fa-chart-column" style="color: #4f46e5;"></i>
+                    Grafik Pemesanan Homestay (Lunas vs Dibatalkan)
+                </h2>
+                <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
+                    Perbandingan jumlah pesanan <span style="color: #2563eb; font-weight: 700;">Lunas (Biru)</span> dan <span style="color: #dc2626; font-weight: 700;">Dibatalkan (Merah)</span> per hari.
+                </div>
+            </div>
+
+            <!-- Month Filter Dropdown -->
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <label for="month_filter" style="font-size: 0.85rem; font-weight: 700; color: #334155;">Filter Bulan:</label>
+                <select id="month_filter" class="form-select-filter" onchange="updateChartData()">
+                    @for($m = 1; $m <= 12; $m++)
+                        @php $mStr = sprintf('%02d', $m); @endphp
+                        <option value="{{ $mStr }}" {{ $mStr == $currentMonth ? 'selected' : '' }}>
+                            {{ Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }} {{ $currentYear }}
+                        </option>
+                    @endfor
+                </select>
+            </div>
         </div>
 
-        <div class="table-container">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>ID Booking</th>
-                        <th>Nama Tamu</th>
-                        <th>Kamar / Unit</th>
-                        <th>Check-in</th>
-                        <th>Check-out</th>
-                        <th>Status</th>
-                        <th>Total</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($recentBookings as $booking)
-                        <tr>
-                            <td style="font-weight: 700; color: #4f46e5;">{{ $booking['id'] }}</td>
-                            <td style="font-weight: 600;">{{ $booking['guest_name'] }}</td>
-                            <td>{{ $booking['room_type'] }}</td>
-                            <td>{{ date('d M Y', strtotime($booking['check_in'])) }}</td>
-                            <td>{{ date('d M Y', strtotime($booking['check_out'])) }}</td>
-                            <td>
-                                @php
-                                    $statusClass = match($booking['status']) {
-                                        'Confirmed' => 'status-confirmed',
-                                        'Pending' => 'status-pending',
-                                        'Checked In' => 'status-checked-in',
-                                        default => 'status-completed',
-                                    };
-                                @endphp
-                                <span class="badge-status {{ $statusClass }}">
-                                    {{ $booking['status'] }}
-                                </span>
-                            </td>
-                            <td style="font-weight: 600;">{{ $booking['total'] }}</td>
-                        </tr>
-                    @endforeach
-                </tbody>
-            </table>
+        <!-- Chart Canvas Container -->
+        <div style="position: relative; height: 380px; width: 100%;">
+            <canvas id="bookingChart"></canvas>
         </div>
     </div>
 
+@endsection
+
+@section('scripts')
+<!-- Chart.js CDN -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+    let bookingChart = null;
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const ctx = document.getElementById('bookingChart').getContext('2d');
+
+        const initialLabels = @json($chartLabels);
+        const initialLunas = @json($chartDataLunas);
+        const initialBatal = @json($chartDataBatal);
+
+        bookingChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: initialLabels,
+                datasets: [
+                    {
+                        label: 'Pesanan Lunas',
+                        data: initialLunas,
+                        backgroundColor: '#3b82f6', // Biru
+                        borderColor: '#2563eb',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                    },
+                    {
+                        label: 'Pesanan Dibatalkan',
+                        data: initialBatal,
+                        backgroundColor: '#ef4444', // Merah
+                        borderColor: '#dc2626',
+                        borderWidth: 1,
+                        borderRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                    mode: 'index',
+                    intersect: false,
+                },
+                plugins: {
+                    legend: {
+                        position: 'top',
+                        labels: {
+                            font: {
+                                family: 'Plus Jakarta Sans',
+                                size: 12,
+                                weight: '700'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                let label = context.dataset.label || '';
+                                if (label) {
+                                    label += ': ';
+                                }
+                                label += context.parsed.y + ' Pemesanan';
+                                return label;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }
+                    },
+                    y: {
+                        beginAtZero: true,
+                        title: { display: true, text: 'Jumlah Pemesanan (Unit)' },
+                        ticks: { stepSize: 1, precision: 0 },
+                        min: 0,
+                    }
+                }
+            }
+        });
+    });
+
+    function updateChartData() {
+        const selectedMonth = document.getElementById('month_filter').value;
+        const currentYear = '{{ $currentYear }}';
+
+        fetch(`/admin/dashboard?month=${selectedMonth}&year=${currentYear}`, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Accept': 'application/json'
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (bookingChart) {
+                bookingChart.data.labels = data.labels;
+                bookingChart.data.datasets[0].data = data.lunas;
+                bookingChart.data.datasets[1].data = data.batal;
+                bookingChart.update();
+            }
+
+            if (data.formatted_revenue) {
+                document.getElementById('monthly_revenue_display').innerText = data.formatted_revenue;
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching chart data:', error);
+        });
+    }
+</script>
 @endsection

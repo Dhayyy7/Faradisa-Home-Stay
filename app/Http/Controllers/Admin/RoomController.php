@@ -23,6 +23,18 @@ class RoomController extends Controller
     }
 
     /**
+     * Display room details with interactive availability calendar.
+     */
+    public function details(Request $request)
+    {
+        $rooms = Room::with(['facilities', 'bookings' => function($q) {
+            $q->whereIn('status', [1, 2, 4]);
+        }])->latest()->get();
+
+        return view('admin.rooms.details', compact('rooms'));
+    }
+
+    /**
      * Store a newly created room in storage.
      */
     public function store(Request $request)

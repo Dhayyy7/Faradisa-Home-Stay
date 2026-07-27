@@ -51,7 +51,7 @@
             </div>
         </div>
 
-        <!-- Dates & Price Breakdown -->
+        <!-- Dates Overview -->
         <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; background-color: #e0e7ff; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem;">
             <div>
                 <div style="font-size: 0.72rem; color: #4338ca; font-weight: 700; text-transform: uppercase;">CHECK-IN</div>
@@ -67,18 +67,31 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.85rem; background-color: #f8fafc; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem; border: 1px solid #e2e8f0;">
+        <!-- Extra Facilities Selected -->
+        <div style="background-color: #f8fafc; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem; border: 1px solid #e2e8f0;">
+            <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase; margin-bottom: 0.5rem;">EXTRA FASILITAS</div>
+            <div id="preview_extra_facilities_container" style="display: flex; flex-wrap: wrap; gap: 0.4rem;">
+                <span style="color: #94a3b8; font-style: italic; font-size: 0.85rem;">Tidak ada extra fasilitas.</span>
+            </div>
+        </div>
+
+        <!-- Price Breakdown -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.85rem; background-color: #f8fafc; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem; border: 1px solid #e2e8f0;">
             <div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">HARGA KAMAR</div>
-                <div style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.15rem;" id="preview_room_price">Rp 0</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">SUBTOTAL BIAYA KAMAR</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.15rem;" id="preview_room_subtotal">Rp 0</div>
             </div>
             <div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">DISKON KAMAR</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">BIAYA EXTRA FASILITAS</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #4338ca; margin-top: 0.15rem;" id="preview_extra_subtotal">Rp 0</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">DISKON KAMAR (%)</div>
                 <div style="font-size: 0.95rem; font-weight: 700; color: #dc2626; margin-top: 0.15rem;" id="preview_discount_percent">Tidak Ada</div>
             </div>
             <div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">TOTAL BIAYA</div>
-                <div style="font-size: 1.05rem; font-weight: 800; color: #16a34a; margin-top: 0.15rem;" id="preview_total_price">Rp 0</div>
+                <div style="font-size: 0.72rem; color: #15803d; font-weight: 700; text-transform: uppercase;">TOTAL KESELURUHAN BIAYA</div>
+                <div style="font-size: 1.1rem; font-weight: 800; color: #16a34a; margin-top: 0.15rem;" id="preview_total_price">Rp 0</div>
             </div>
         </div>
 

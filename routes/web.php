@@ -5,8 +5,10 @@ use App\Http\Controllers\Auth\LoginController;
 use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FacilityController;
+use App\Http\Controllers\Admin\ExtraFacilityController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RoomController;
+use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 
 // Homepage redirect or welcome
@@ -21,16 +23,21 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 // Protected Admin Routes
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
-    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
-    // Booking Management Routes (Accessible to Auth Users)
+    // Room Details Route (Accessible to All Auth Users/Staff)
+    Route::get('/admin/rooms/details', [RoomController::class, 'details'])->name('admin.rooms.details');
+
+    // Booking Management Routes (Accessible to Auth Users/Staff)
     Route::get('/admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');
     Route::post('/admin/bookings', [BookingController::class, 'store'])->name('admin.bookings.store');
     Route::put('/admin/bookings/{booking}', [BookingController::class, 'update'])->name('admin.bookings.update');
+    Route::patch('/admin/bookings/{booking}/lunas', [BookingController::class, 'markAsLunas'])->name('admin.bookings.mark-lunas');
     Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])->name('admin.bookings.destroy');
     
     // Super Admin Only Routes
     Route::middleware(['superadmin'])->group(function () {
+        // Analytics Dashboard Route (Super Admin Only)
+        Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
         // Room & Unit Management Routes
         Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
         Route::post('/admin/rooms', [RoomController::class, 'store'])->name('admin.rooms.store');
@@ -42,6 +49,16 @@ Route::middleware(['auth'])->group(function () {
         Route::post('/admin/facilities', [FacilityController::class, 'store'])->name('admin.facilities.store');
         Route::put('/admin/facilities/{facility}', [FacilityController::class, 'update'])->name('admin.facilities.update');
         Route::delete('/admin/facilities/{facility}', [FacilityController::class, 'destroy'])->name('admin.facilities.destroy');
+
+        // Master Extra Facility Routes
+        Route::get('/admin/extra-facilities', [ExtraFacilityController::class, 'index'])->name('admin.extra-facilities.index');
+        Route::post('/admin/extra-facilities', [ExtraFacilityController::class, 'store'])->name('admin.extra-facilities.store');
+        Route::put('/admin/extra-facilities/{extraFacility}', [ExtraFacilityController::class, 'update'])->name('admin.extra-facilities.update');
+        Route::delete('/admin/extra-facilities/{extraFacility}', [ExtraFacilityController::class, 'destroy'])->name('admin.extra-facilities.destroy');
+
+        // Settings / Pengaturan Routes
+        Route::get('/admin/settings', [SettingController::class, 'index'])->name('admin.settings.index');
+        Route::post('/admin/settings', [SettingController::class, 'update'])->name('admin.settings.update');
 
         // User Management Routes
         Route::get('/admin/users', [UserController::class, 'index'])->name('admin.users.index');

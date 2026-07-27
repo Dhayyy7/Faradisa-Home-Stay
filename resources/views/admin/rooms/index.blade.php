@@ -142,6 +142,88 @@
         background-color: #fca5a5;
     }
 
+    /* Room Detail & Calendar Cards Grid */
+    .room-cards-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+        gap: 1.5rem;
+        margin-top: 1.25rem;
+    }
+
+    .room-detail-card {
+        background: #ffffff;
+        border-radius: 18px;
+        border: 1px solid #e2e8f0;
+        box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        padding: 1.25rem;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .room-calendar-grid {
+        display: grid;
+        grid-template-columns: repeat(7, 1fr);
+        gap: 4px;
+        margin-top: 0.75rem;
+        text-align: center;
+    }
+
+    .calendar-day-header {
+        font-size: 0.65rem;
+        font-weight: 700;
+        color: #64748b;
+        padding: 0.2rem 0;
+        text-transform: uppercase;
+    }
+
+    .calendar-day-cell {
+        aspect-ratio: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 6px;
+        font-size: 0.72rem;
+        font-weight: 700;
+        position: relative;
+    }
+
+    .day-available {
+        background-color: #f0fdf4;
+        color: #16a34a;
+        border: 1px solid #bbf7d0;
+    }
+
+    .day-booked {
+        background-color: #fee2e2;
+        color: #dc2626;
+        border: 1px solid #fca5a5;
+        font-weight: 800;
+        position: relative;
+        overflow: hidden;
+    }
+
+    .day-booked::before,
+    .day-booked::after {
+        content: '';
+        position: absolute;
+        width: 2px;
+        height: 110%;
+        background-color: #dc2626;
+        top: -5%;
+        left: 50%;
+        opacity: 0.8;
+        pointer-events: none;
+    }
+
+    .day-booked::before {
+        transform: rotate(45deg);
+    }
+
+    .day-booked::after {
+        transform: rotate(-45deg);
+    }
+
     /* Modal Backdrop & Card */
     .modal-backdrop {
         position: fixed;

@@ -4,7 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@yield('title', 'Admin Dashboard') - Faradisa HomeStay</title>
+    @php
+        $appSetting = \App\Models\Setting::getSetting();
+    @endphp
+
+    <title>@yield('title', 'Admin Dashboard') - {{ $appSetting->homestay_name ?? 'Faradisa HomeStay' }}</title>
+
+    <!-- Favicon Icon Tab Web -->
+    @if($appSetting->logo && file_exists(public_path($appSetting->logo)))
+        <link rel="icon" type="image/x-icon" href="/{{ $appSetting->logo }}">
+        <link rel="shortcut icon" href="/{{ $appSetting->logo }}">
+        <link rel="apple-touch-icon" href="/{{ $appSetting->logo }}">
+    @endif
 
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -352,14 +363,24 @@
 
     <!-- Sidebar Navigation -->
     <aside class="sidebar">
+        @php
+            $appSetting = \App\Models\Setting::getSetting();
+        @endphp
         <div class="sidebar-brand">
-            <div class="sidebar-brand-icon">
-                <i class="fa-solid fa-house-chimney"></i>
-            </div>
-            <div class="sidebar-brand-text">Faradisa Admin</div>
+            @if($appSetting->logo && file_exists(public_path($appSetting->logo)))
+                <div class="sidebar-brand-icon" style="background: #ffffff; padding: 3px; border: 1px solid rgba(255,255,255,0.2);">
+                    <img src="/{{ $appSetting->logo }}" alt="Logo {{ $appSetting->homestay_name }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                </div>
+            @else
+                <div class="sidebar-brand-icon">
+                    <i class="fa-solid fa-house-chimney"></i>
+                </div>
+            @endif
+            <div class="sidebar-brand-text" style="white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">{{ $appSetting->homestay_name ?? 'Faradisa Admin' }}</div>
         </div>
 
         <ul class="sidebar-menu">
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
             <div class="menu-category"> Utama </div>
             <li class="nav-item">
                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -367,15 +388,26 @@
                     <span>Dashboard</span>
                 </a>
             </li>
+            @endif
 
             <div class="menu-category"> Pengelolaan </div>
             @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
             <li class="nav-item">
-                <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.*') ? 'active' : '' }}">
+                <a href="{{ route('admin.rooms.index') }}" class="nav-link {{ request()->routeIs('admin.rooms.index') ? 'active' : '' }}">
                     <i class="fa-solid fa-bed"></i>
                     <span>Kamar & Unit</span>
                 </a>
             </li>
+            @endif
+
+            <li class="nav-item">
+                <a href="{{ route('admin.rooms.details') }}" class="nav-link {{ request()->routeIs('admin.rooms.details') ? 'active' : '' }}">
+                    <i class="fa-solid fa-calendar-days"></i>
+                    <span>Detail Kamar</span>
+                </a>
+            </li>
+
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
             <li class="nav-item">
                 <a href="{{ route('admin.facilities.index') }}" class="nav-link {{ request()->routeIs('admin.facilities.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-list-check"></i>
@@ -383,12 +415,21 @@
                 </a>
             </li>
             @endif
+
             <li class="nav-item">
                 <a href="{{ route('admin.bookings.index') }}" class="nav-link {{ request()->routeIs('admin.bookings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-calendar-check"></i>
                     <span>Pemesanan</span>
                 </a>
             </li>
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
+            <li class="nav-item">
+                <a href="{{ route('admin.extra-facilities.index') }}" class="nav-link {{ request()->routeIs('admin.extra-facilities.*') ? 'active' : '' }}">
+                    <i class="fa-solid fa-square-plus"></i>
+                    <span>Extra Fasilitas</span>
+                </a>
+            </li>
+            @endif
             <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fa-solid fa-users"></i>
@@ -411,12 +452,14 @@
                 </a>
             </li>
             @endif
+            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
             <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings.*') ? 'active' : '' }}">
                     <i class="fa-solid fa-gear"></i>
                     <span>Pengaturan</span>
                 </a>
             </li>
+            @endif
         </ul>
     </aside>
 
@@ -484,7 +527,7 @@
 
         <!-- Footer -->
         <footer class="footer">
-            &copy; {{ date('Y') }} Faradisa HomeStay - Panel Kontrol Admin.
+            &copy; {{ date('Y') }} {{ $appSetting->homestay_name ?? 'Faradisa HomeStay' }} - Panel Kontrol Admin.
         </footer>
     </div>
 

@@ -25,6 +25,14 @@
         document.getElementById('edit_check_in_date').value = checkIn;
         document.getElementById('edit_check_out_date').value = checkOut;
 
+        // Check selected extra facilities
+        const selectedExtraIds = (booking.extra_facilities && Array.isArray(booking.extra_facilities))
+            ? booking.extra_facilities.map(item => parseInt(item.id))
+            : [];
+        document.querySelectorAll('.edit-extra-facility-checkbox').forEach(cb => {
+            cb.checked = selectedExtraIds.includes(parseInt(cb.value));
+        });
+
         document.getElementById('editModal').classList.add('show');
     }
 
@@ -54,13 +62,47 @@
         document.getElementById('preview_check_out').innerText = checkOutDate;
         document.getElementById('preview_total_nights').innerText = `${booking.total_nights} Malam`;
 
-        document.getElementById('preview_room_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(booking.room_price);
+        // Render Extra Facilities
+        const extraContainer = document.getElementById('preview_extra_facilities_container');
+        extraContainer.innerHTML = '';
+
+        if (booking.extra_facilities && Array.isArray(booking.extra_facilities) && booking.extra_facilities.length > 0) {
+            booking.extra_facilities.forEach(ef => {
+                const badge = document.createElement('span');
+                badge.style.backgroundColor = '#e0e7ff';
+                badge.style.color = '#4338ca';
+                badge.style.padding = '0.3rem 0.65rem';
+                badge.style.borderRadius = '20px';
+                badge.style.fontSize = '0.78rem';
+                badge.style.fontWeight = '600';
+                badge.innerHTML = `<i class="fa-solid fa-square-plus" style="margin-right: 0.3rem;"></i> ${ef.name} (+Rp ${new Intl.NumberFormat('id-ID').format(ef.price)})`;
+                extraContainer.appendChild(badge);
+            });
+        } else {
+            extraContainer.innerHTML = '<span style="color: #94a3b8; font-style: italic; font-size: 0.85rem;">Tidak ada extra fasilitas.</span>';
+        }
+
+        // Subtotal calculations
+        const discountMultiplier = 1 - ((booking.discount || 0) / 100);
+        const roomSubtotal = (booking.room_price * discountMultiplier) * booking.total_nights;
+        
+        let extraSubtotal = 0;
+        if (booking.extra_facilities && Array.isArray(booking.extra_facilities)) {
+            booking.extra_facilities.forEach(ef => {
+                extraSubtotal += parseFloat(ef.price || 0);
+            });
+        }
+
+        document.getElementById('preview_room_subtotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(roomSubtotal);
+        document.getElementById('preview_extra_subtotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(extraSubtotal);
         document.getElementById('preview_discount_percent').innerText = booking.discount && booking.discount > 0 ? `${booking.discount}% OFF` : 'Tidak Ada';
         document.getElementById('preview_total_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(booking.total_price);
 
         // Render Status Badge
         const statusBadge = document.getElementById('preview_status_badge');
-        if (booking.status === 3) {
+        if (booking.status === 4) {
+            statusBadge.innerHTML = '<span style="background-color: #f3e8ff; color: #7e22ce; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-coins"></i> DP 50% (Panjar)</span>';
+        } else if (booking.status === 3) {
             statusBadge.innerHTML = '<span style="background-color: #dbeafe; color: #1e40af; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-flag-checkered"></i> Selesai (Completed)</span>';
         } else if (booking.status === 2) {
             statusBadge.innerHTML = '<span style="background-color: #dcfce7; color: #166534; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-circle-check"></i> Lunas / Terkonfirmasi</span>';
