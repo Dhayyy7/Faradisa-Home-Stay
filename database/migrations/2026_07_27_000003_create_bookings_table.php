@@ -25,7 +25,7 @@ return new class extends Migration
             $table->decimal('room_price', 12, 2);
             $table->decimal('discount', 5, 2)->nullable(); // percent % from room if any
             $table->decimal('total_price', 12, 2);
-            $table->tinyInteger('status')->default(1); // 1 = Pending (2 Jam), 2 = Lunas, 0 = Batal/Expired
+            $table->tinyInteger('status')->default(1); // 1 = Pending (2 Jam), 2 = Lunas, 3 = Selesai (Completed), 0 = Batal/Expired
             $table->timestamp('expired_at')->nullable(); // Auto expiration time for pending
             $table->text('extra_facilities')->nullable(); // nullable
             $table->softDeletes();

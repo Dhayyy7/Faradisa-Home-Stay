@@ -57,6 +57,7 @@ class Booking extends Model
     public function getStatusLabelAttribute(): string
     {
         return match ($this->status) {
+            3 => 'Selesai (Completed)',
             2 => 'Lunas',
             1 => 'Menunggu Pembayaran (Pending)',
             0 => 'Dibatalkan / Expired',
@@ -70,6 +71,7 @@ class Booking extends Model
     public function getStatusBadgeAttribute(): array
     {
         return match ($this->status) {
+            3 => ['label' => 'Selesai', 'bg' => '#dbeafe', 'color' => '#1e40af', 'icon' => 'fa-flag-checkered'],
             2 => ['label' => 'Lunas', 'bg' => '#dcfce7', 'color' => '#166534', 'icon' => 'fa-circle-check'],
             1 => ['label' => 'Pending (WA)', 'bg' => '#fef3c7', 'color' => '#b45309', 'icon' => 'fa-clock'],
             0 => ['label' => 'Dibatalkan', 'bg' => '#fee2e2', 'color' => '#991b1b', 'icon' => 'fa-circle-xmark'],

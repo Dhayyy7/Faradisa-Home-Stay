@@ -5,18 +5,6 @@
 
 @section('styles')
 <style>
-    .room-grid {
-        display: grid;
-        grid-template-columns: 1fr 2.4fr;
-        gap: 1.5rem;
-    }
-
-    @media (max-width: 992px) {
-        .room-grid {
-            grid-template-columns: 1fr;
-        }
-    }
-
     /* Checkbox Group for Select to Many Facilities */
     .facility-checkbox-grid {
         display: grid;
@@ -216,144 +204,110 @@
 
 @section('content')
 
-<div class="room-grid">
-    <!-- Form Tambah Kamar -->
-    <div class="card">
-        <h2 class="card-title">
-            <i class="fa-solid fa-plus-circle" style="color: #4f46e5;"></i>
-            Tambah Kamar / Unit
-        </h2>
-
-        <form action="{{ route('admin.rooms.store') }}" method="POST" enctype="multipart/form-data">
-            @csrf
-
-            <div class="form-group">
-                <label for="code" class="form-label">Kode Kamar</label>
-                <input type="text" id="code" name="code" class="form-input" placeholder="Masukan Kode Kamar" required>
-            </div>
-
-            <div class="form-group">
-                <label for="name" class="form-label">Nama Kamar / Unit</label>
-                <input type="text" id="name" name="name" class="form-input" placeholder="Masukan Nama Kamar" required>
-            </div>
-
-            <div class="form-group">
-                <label for="price" class="form-label">Harga per Malam (Rp)</label>
-                <input type="number" id="price" name="price" class="form-input" placeholder="Masukan Harga Kamar" min="0" required>
-            </div>
-
-            <div class="form-group">
-                <label for="discount" class="form-label">Diskon (%) <span style="font-weight: 400; color: #64748b;">(Persen, Opsional)</span></label>
-                <input type="number" id="discount" name="discount" class="form-input" placeholder="Masukan Diskon" min="0" max="100" step="0.1">
-            </div>
-
-            <div class="form-group">
-                <label class="form-label">Fasilitas Kamar <span style="font-weight: 400; color: #64748b;">(Pilih Banyak)</span></label>
-                <div class="facility-checkbox-grid">
-                    @foreach($facilities as $f)
-                    <label class="facility-checkbox-item">
-                        <input type="checkbox" name="facilities[]" value="{{ $f->id }}">
-                        <span>{{ $f->name }}</span>
-                    </label>
-                    @endforeach
-                </div>
-            </div>
-
-            <div class="form-group">
-                <label for="images" class="form-label">Foto Kamar <span style="font-weight: 400; color: #64748b;">(Maksimal 5 Foto)</span></label>
-                <input type="file" id="images" name="images[]" class="form-input" multiple accept="image/*">
-            </div>
-
-            <button type="submit" class="btn-submit">
-                <i class="fa-solid fa-save"></i>
-                <span>Simpan Kamar</span>
-            </button>
-        </form>
-    </div>
-
-    <!-- Tabel Daftar Kamar -->
-    <div class="card">
-        <h2 class="card-title">
+<!-- Card Full Width Tabel Daftar Kamar -->
+<div class="card" style="width: 100%;">
+    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.25rem; flex-wrap: wrap; gap: 1rem;">
+        <h2 class="card-title" style="margin-bottom: 0;">
             <i class="fa-solid fa-bed" style="color: #4f46e5;"></i>
             Daftar Kamar & Unit Terdaftar
         </h2>
+        <button type="button" class="btn-submit" onclick="openCreateRoomModal()">
+            <i class="fa-solid fa-plus-circle"></i>
+            <span>Tambah Kamar / Unit</span>
+        </button>
+    </div>
 
-        <div style="overflow-x: auto;">
-            <table class="data-table">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>Kode & Nama Kamar</th>
-                        <th>Harga Normal</th>
-                        <th>Diskon</th>
-                        <th>Fasilitas</th>
-                        <th style="text-align: center;">Aksi</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach($rooms as $index => $room)
-                    <tr>
-                        <td>{{ $index + 1 }}</td>
-                        <td>
-                            <div><span class="badge-code">{{ $room->code }}</span></div>
-                            <div style="font-weight: 700; color: #1e293b; margin-top: 0.25rem;">{{ $room->name }}</div>
-                        </td>
-                        <td>
-                            <div style="font-weight: 700; color: #0f172a;">Rp {{ number_format($room->price, 0, ',', '.') }}</div>
-                            @if($room->discount && $room->discount > 0)
-                            <div style="font-size: 0.78rem; color: #16a34a; font-weight: 600;">
-                                Nett: Rp {{ number_format($room->final_price, 0, ',', '.') }}
+    <div style="overflow-x: auto;">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>#</th>
+                    <th>Foto</th>
+                    <th>Kode & Nama Kamar</th>
+                    <th>Harga Normal</th>
+                    <th>Diskon</th>
+                    <th>Fasilitas</th>
+                    <th style="text-align: center;">Aksi</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach($rooms as $index => $room)
+                <tr>
+                    <td>{{ $index + 1 }}</td>
+                    <td>
+                        @php
+                            $roomImages = is_array($room->images) ? $room->images : [];
+                            $lastImage = count($roomImages) > 0 ? end($roomImages) : null;
+                        @endphp
+                        @if($lastImage)
+                            <img src="/{{ $lastImage }}" alt="{{ $room->name }}" style="width: 55px; height: 55px; object-fit: cover; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        @else
+                            <div style="width: 55px; height: 55px; border-radius: 10px; background-color: #f1f5f9; border: 1px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.68rem; text-align: center;">
+                                <i class="fa-solid fa-image" style="font-size: 0.9rem; margin-bottom: 0.15rem; color: #cbd5e1;"></i>
+                                No Image
                             </div>
-                            @endif
-                        </td>
-                        <td>
-                            @if($room->discount && $room->discount > 0)
-                            <span class="badge-discount-percent">{{ number_format($room->discount, 0) }}% OFF</span>
-                            @else
-                            <span style="color: #94a3b8; font-style: italic;">Tidak ada</span>
-                            @endif
-                        </td>
-                        <td>
-                            @forelse($room->facilities as $f)
-                            <span class="facility-badge-pill">
-                                <i class="fa-solid {{ $f->icon ?? 'fa-check' }}" style="font-size: 0.7rem; color: #4f46e5;"></i>
-                                {{ $f->name }}
-                            </span>
-                            @empty
-                            <span style="color: #94a3b8; font-style: italic;">Belum ada fasilitas</span>
-                            @endforelse
-                        </td>
-                        <td style="text-align: center;">
-                            <div class="action-btns">
-                                <button type="button" class="btn-preview" onclick="openPreviewModal({{ json_encode($room) }}, {{ json_encode($room->facilities) }}, {{ $room->final_price }})">
-                                    <i class="fa-solid fa-eye"></i>
-                                    <span>Preview</span>
-                                </button>
+                        @endif
+                    </td>
+                    <td>
+                        <div><span class="badge-code">{{ $room->code }}</span></div>
+                        <div style="font-weight: 700; color: #1e293b; margin-top: 0.25rem;">{{ $room->name }}</div>
+                    </td>
+                    <td>
+                        <div style="font-weight: 700; color: #0f172a;">Rp {{ number_format($room->price, 0, ',', '.') }}</div>
+                        @if($room->discount && $room->discount > 0)
+                        <div style="font-size: 0.78rem; color: #16a34a; font-weight: 600;">
+                            Nett: Rp {{ number_format($room->final_price, 0, ',', '.') }}
+                        </div>
+                        @endif
+                    </td>
+                    <td>
+                        @if($room->discount && $room->discount > 0)
+                        <span class="badge-discount-percent">{{ number_format($room->discount, 0) }}% OFF</span>
+                        @else
+                        <span style="color: #94a3b8; font-style: italic;">Tidak ada</span>
+                        @endif
+                    </td>
+                    <td>
+                        @forelse($room->facilities as $f)
+                        <span class="facility-badge-pill">
+                            <i class="fa-solid {{ $f->icon ?? 'fa-check' }}" style="font-size: 0.7rem; color: #4f46e5;"></i>
+                            {{ $f->name }}
+                        </span>
+                        @empty
+                        <span style="color: #94a3b8; font-style: italic;">Belum ada fasilitas</span>
+                        @endforelse
+                    </td>
+                    <td style="text-align: center;">
+                        <div class="action-btns">
+                            <button type="button" class="btn-preview" onclick="openPreviewModal({{ json_encode($room) }}, {{ json_encode($room->facilities) }}, {{ $room->final_price }})">
+                                <i class="fa-solid fa-eye"></i>
+                                <span>Preview</span>
+                            </button>
 
-                                <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, {{ json_encode($room->facilities->pluck('id')->toArray()) }})">
-                                    <i class="fa-solid fa-pen-to-square"></i>
-                                    <span>Edit</span>
-                                </button>
+                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, {{ json_encode($room->facilities->pluck('id')->toArray()) }})">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                                <span>Edit</span>
+                            </button>
 
-                                <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST">
-                                    @csrf
-                                    @method('DELETE')
-                                    <button type="button" class="btn-delete" onclick="confirmDelete(this, 'Apakah Anda yakin ingin menghapus kamar {{ $room->name }}?')">
-                                        <i class="fa-solid fa-trash-can"></i>
-                                        <span>Hapus</span>
-                                    </button>
-                                </form>
-                            </div>
-                        </td>
-                    </tr>
-                    @endforeach
-                </tbody>
-            </table>
-        </div>
+                            <form action="{{ route('admin.rooms.destroy', $room->id) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+                                <button type="button" class="btn-delete" onclick="confirmDelete(this, 'Apakah Anda yakin ingin menghapus kamar {{ $room->name }}?')">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                    <span>Hapus</span>
+                                </button>
+                            </form>
+                        </div>
+                    </td>
+                </tr>
+                @endforeach
+            </tbody>
+        </table>
     </div>
 </div>
 
 <!-- Modal Partials -->
+@include('admin.rooms.modals.create')
 @include('admin.rooms.modals.edit')
 @include('admin.rooms.modals.preview')
 

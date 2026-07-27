@@ -17,6 +17,7 @@
                 <select id="edit_status" name="status" class="form-select" required>
                     <option value="1">🟡 Pending (Menunggu Pembayaran / WA)</option>
                     <option value="2">🟢 Lunas (Terkonfirmasi - Berhasil)</option>
+                    <option value="3">🔵 Selesai (Completed - Check-Out)</option>
                     <option value="0">🔴 Dibatalkan / Expired (Kamar Bebas)</option>
                 </select>
             </div>

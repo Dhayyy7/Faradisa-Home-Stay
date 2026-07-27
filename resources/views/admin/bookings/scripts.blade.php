@@ -1,4 +1,12 @@
 <script>
+    function openCreateBookingModal() {
+        document.getElementById('createBookingModal').classList.add('show');
+    }
+
+    function closeCreateBookingModal() {
+        document.getElementById('createBookingModal').classList.remove('show');
+    }
+
     function openEditModal(booking, room) {
         const form = document.getElementById('editForm');
         form.action = `/admin/bookings/${booking.id}`;
@@ -52,7 +60,9 @@
 
         // Render Status Badge
         const statusBadge = document.getElementById('preview_status_badge');
-        if (booking.status === 2) {
+        if (booking.status === 3) {
+            statusBadge.innerHTML = '<span style="background-color: #dbeafe; color: #1e40af; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-flag-checkered"></i> Selesai (Completed)</span>';
+        } else if (booking.status === 2) {
             statusBadge.innerHTML = '<span style="background-color: #dcfce7; color: #166534; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-circle-check"></i> Lunas / Terkonfirmasi</span>';
         } else if (booking.status === 1) {
             statusBadge.innerHTML = '<span style="background-color: #fef3c7; color: #b45309; padding: 0.25rem 0.65rem; border-radius: 20px; font-weight: 700; font-size: 0.8rem; display: inline-flex; align-items: center; gap: 0.35rem;"><i class="fa-solid fa-clock"></i> Pending</span>';

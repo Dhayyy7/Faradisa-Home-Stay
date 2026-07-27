@@ -1,4 +1,12 @@
 <script>
+    function openCreateRoomModal() {
+        document.getElementById('createRoomModal').classList.add('show');
+    }
+
+    function closeCreateRoomModal() {
+        document.getElementById('createRoomModal').classList.remove('show');
+    }
+
     function openEditModal(id, code, name, price, discount, selectedFacilityIds) {
         const form = document.getElementById('editForm');
         form.action = `/admin/rooms/${id}`;

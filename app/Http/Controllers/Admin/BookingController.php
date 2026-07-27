@@ -11,13 +11,19 @@ use Illuminate\Http\Request;
 class BookingController extends Controller
 {
     /**
-     * Helper to auto-cancel expired pending bookings.
+     * Helper to auto-update booking statuses (Expiration & Check-Out Completion).
      */
-    private function autoCancelExpiredBookings()
+    private function autoUpdateBookingStatuses()
     {
+        // 1. Auto cancel pending bookings older than 2 hours (Status 1 -> 0)
         Booking::where('status', 1)
             ->where('expired_at', '<=', now())
             ->update(['status' => 0]);
+
+        // 2. Auto complete paid bookings whose check-out date has passed (Status 2 -> 3)
+        Booking::where('status', 2)
+            ->where('check_out_date', '<', date('Y-m-d'))
+            ->update(['status' => 3]);
     }
 
     /**
@@ -25,7 +31,7 @@ class BookingController extends Controller
      */
     public function index()
     {
-        $this->autoCancelExpiredBookings();
+        $this->autoUpdateBookingStatuses();
 
         $bookings = Booking::with('room')->latest()->get();
         $rooms = Room::all();
@@ -38,7 +44,7 @@ class BookingController extends Controller
      */
     public function store(Request $request)
     {
-        $this->autoCancelExpiredBookings();
+        $this->autoUpdateBookingStatuses();
 
         $request->validate([
             'room_id' => ['required', 'exists:rooms,id'],
@@ -48,7 +54,7 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
-            'status' => ['nullable', 'integer', 'in:0,1,2'],
+            'status' => ['nullable', 'integer', 'in:0,1,2,3'],
             'extra_facilities' => ['nullable', 'string'],
         ], [
             'room_id.required' => 'Pilih kamar terlebih dahulu.',
@@ -64,7 +70,7 @@ class BookingController extends Controller
         $checkInStr = $request->input('check_in_date');
         $checkOutStr = $request->input('check_out_date');
 
-        // Check availability for overlaps
+        // Check availability for overlaps with active bookings (status 1 or 2)
         $isConflict = Booking::where('room_id', $roomId)
             ->whereIn('status', [1, 2])
             ->where(function ($q) {
@@ -131,7 +137,7 @@ class BookingController extends Controller
      */
     public function update(Request $request, Booking $booking)
     {
-        $this->autoCancelExpiredBookings();
+        $this->autoUpdateBookingStatuses();
 
         $request->validate([
             'room_id' => ['required', 'exists:rooms,id'],
@@ -141,7 +147,7 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
-            'status' => ['required', 'integer', 'in:0,1,2'],
+            'status' => ['required', 'integer', 'in:0,1,2,3'],
             'extra_facilities' => ['nullable', 'string'],
         ], [
             'room_id.required' => 'Pilih kamar terlebih dahulu.',
@@ -159,7 +165,7 @@ class BookingController extends Controller
 
         $newStatus = (int) $request->input('status');
 
-        // If status is active (1 or 2), check for conflicts with OTHER bookings
+        // If status is active (1 or 2), check for conflicts with OTHER active bookings
         if (in_array($newStatus, [1, 2])) {
             $isConflict = Booking::where('room_id', $roomId)
                 ->where('id', '!=', $booking->id)
@@ -203,10 +209,10 @@ class BookingController extends Controller
         $finalPricePerNight = $room->final_price;
         $totalPrice = $finalPricePerNight * $totalNights;
 
-        // Manage expired_at: if changing to 1 (pending), extend 2 hours. If 2 (lunas) or 0 (batal), clear expired_at
+        // Manage expired_at: if changing to 1 (pending), extend 2 hours. If 2 (lunas), 3 (selesai) or 0 (batal), clear expired_at
         $expiredAt = $booking->expired_at;
         if ($newStatus == 1 && $booking->status != 1) {
-            $expiredAt = Carbon::now()->addHours(2); // Total Jam Pending
+            $expiredAt = Carbon::now()->addHours(2);
         } elseif ($newStatus != 1) {
             $expiredAt = null;
         }
