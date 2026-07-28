@@ -11,10 +11,10 @@ use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\SettingController;
 use App\Http\Controllers\Admin\UserController;
 
-// Homepage redirect or welcome
-Route::get('/', function () {
-    return redirect()->route('login');
-});
+use App\Http\Controllers\LandingController;
+
+// Homepage Landing Page
+Route::get('/', [LandingController::class, 'index'])->name('home');
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');

@@ -152,6 +152,21 @@
                 </div>
             </div>
 
+            <!-- Alamat Lengkap Homestay -->
+            <div class="form-group">
+                <label for="address" class="form-label">Alamat Lengkap Homestay</label>
+                <textarea id="address" name="address" class="form-input" rows="3" placeholder="Masukkan alamat lengkap homestay Anda">{{ old('address', $setting->address) }}</textarea>
+            </div>
+
+            <!-- Link Google Maps -->
+            <div class="form-group">
+                <label for="gmap_link" class="form-label">Link Lokasi Google Maps</label>
+                <input type="text" id="gmap_link" name="gmap_link" class="form-input" value="{{ old('gmap_link', $setting->gmap_link) }}" placeholder="https://maps.google.com/?q=Lokasi+Homestay">
+                <div style="font-size: 0.75rem; color: #64748b; margin-top: 0.3rem;">
+                    Link ini akan digunakan untuk tombol petunjuk arah Google Maps di Landing Page.
+                </div>
+            </div>
+
             <button type="submit" class="btn-submit" style="width: 100%; justify-content: center; margin-top: 1rem;">
                 <i class="fa-solid fa-save"></i>
                 <span>Simpan Pengaturan</span>

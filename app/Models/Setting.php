@@ -11,6 +11,8 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'logo',
     'homestay_name',
     'wa_number',
+    'address',
+    'gmap_link',
     'media_assets',
 ])]
 class Setting extends Model
@@ -40,6 +42,8 @@ class Setting extends Model
                 'logo' => null,
                 'homestay_name' => 'Faradisa HomeStay',
                 'wa_number' => '081234567890',
+                'address' => 'Jl. Utama Homestay, Akses Mudah & Aman',
+                'gmap_link' => 'https://maps.google.com/?q=Faradisa+HomeStay',
                 'media_assets' => [],
             ]
         );

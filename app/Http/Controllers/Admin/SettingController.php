@@ -27,6 +27,8 @@ class SettingController extends Controller
         $request->validate([
             'homestay_name' => ['required', 'string', 'max:255'],
             'wa_number' => ['required', 'string', 'max:50'],
+            'address' => ['nullable', 'string', 'max:1000'],
+            'gmap_link' => ['nullable', 'string', 'max:1000'],
             'logo' => ['nullable', 'image', 'mimes:jpeg,png,jpg,gif,svg,webp', 'max:2048'],
             'new_assets.*' => ['nullable', 'file', 'mimes:jpeg,png,jpg,webp,mp4,webm,mov,avi', 'max:20480'],
             'delete_assets' => ['nullable', 'array'],
@@ -43,6 +45,8 @@ class SettingController extends Controller
 
         $homestayName = $request->input('homestay_name');
         $waNumber = $request->input('wa_number');
+        $address = $request->input('address');
+        $gmapLink = $request->input('gmap_link');
 
         // Handle Logo Upload
         $logoPath = $setting->logo;
@@ -122,6 +126,8 @@ class SettingController extends Controller
         $setting->update([
             'homestay_name' => $homestayName,
             'wa_number' => $waNumber,
+            'address' => $address,
+            'gmap_link' => $gmapLink,
             'logo' => $logoPath,
             'media_assets' => $reindexedAssets,
         ]);
