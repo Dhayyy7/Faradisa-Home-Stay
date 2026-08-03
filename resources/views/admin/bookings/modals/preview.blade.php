@@ -95,7 +95,11 @@
             </div>
         </div>
 
-        <div style="display: flex; justify-content: flex-end; margin-top: 1.5rem;">
+        <div style="display: flex; justify-content: flex-end; gap: 0.75rem; margin-top: 1.5rem;">
+            <a id="preview_print_nota_btn" href="#" target="_blank" class="btn-submit" style="background-color: #f59e0b; color: white; display: none; text-decoration: none; align-items: center; gap: 0.4rem;">
+                <i class="fa-solid fa-print"></i>
+                <span>Cetak Nota Pembayaran</span>
+            </a>
             <button type="button" class="btn-edit" style="background-color: #f1f5f9; color: #475569; width: auto; padding: 0.6rem 1.25rem;" onclick="closePreviewModal()">
                 Tutup Preview
             </button>

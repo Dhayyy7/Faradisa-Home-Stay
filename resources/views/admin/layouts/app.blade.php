@@ -355,6 +355,99 @@
             font-size: 0.85rem;
             color: var(--text-muted);
         }
+
+        /* Mobile Sidebar & Toggle Styles */
+        .sidebar-toggle-btn {
+            display: none;
+            background: #f1f5f9;
+            border: 1px solid #cbd5e1;
+            color: var(--text-dark);
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            font-size: 1.1rem;
+            cursor: pointer;
+            align-items: center;
+            justify-content: center;
+            margin-right: 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        .sidebar-toggle-btn:hover {
+            background: #e2e8f0;
+            color: var(--primary);
+        }
+
+        .sidebar-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 95;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -260px;
+                box-shadow: 10px 0 30px rgba(0,0,0,0.25);
+            }
+
+            .sidebar.mobile-open {
+                left: 0;
+            }
+
+            .main-wrapper {
+                margin-left: 0;
+            }
+
+            .sidebar-toggle-btn {
+                display: flex;
+            }
+
+            .topbar {
+                padding: 0 1rem;
+            }
+
+            .content-area {
+                padding: 1.25rem 1rem;
+            }
+
+            .user-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .topbar-title {
+                font-size: 1.05rem;
+            }
+
+            .user-profile {
+                padding: 0.25rem 0.5rem;
+            }
+
+            .btn-logout span {
+                display: none;
+            }
+
+            .btn-logout {
+                padding: 0.5rem;
+            }
+
+            .footer {
+                padding: 1rem;
+                font-size: 0.78rem;
+            }
+        }
     </style>
     @yield('styles')
 </head>
@@ -430,12 +523,12 @@
                 </a>
             </li>
             @endif
-            <li class="nav-item">
+            {{-- <li class="nav-item">
                 <a href="#" class="nav-link">
                     <i class="fa-solid fa-users"></i>
                     <span>Data Tamu</span>
                 </a>
-            </li>
+            </li> --}}
 
             <div class="menu-category"> Sistem </div>
             @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
@@ -463,11 +556,19 @@
         </ul>
     </aside>
 
+    <!-- Mobile Sidebar Backdrop Overlay -->
+    <div class="sidebar-overlay" onclick="toggleMobileSidebar()"></div>
+
     <!-- Main Wrapper -->
     <div class="main-wrapper">
         <!-- Top Navbar -->
         <header class="topbar">
-            <h1 class="topbar-title">@yield('page_title', 'Dashboard Overview')</h1>
+            <div style="display: flex; align-items: center;">
+                <button type="button" class="sidebar-toggle-btn" onclick="toggleMobileSidebar()" title="Buka Menu Sidebar">
+                    <i class="fa-solid fa-bars"></i>
+                </button>
+                <h1 class="topbar-title">@yield('page_title', 'Dashboard Overview')</h1>
+            </div>
 
             <div class="topbar-actions">
                 <div class="user-profile">
@@ -535,6 +636,15 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
+        function toggleMobileSidebar() {
+            const sidebar = document.querySelector('.sidebar');
+            const overlay = document.querySelector('.sidebar-overlay');
+            if (sidebar && overlay) {
+                sidebar.classList.toggle('mobile-open');
+                overlay.classList.toggle('active');
+            }
+        }
+
         function confirmDelete(button, message = 'Apakah Anda yakin ingin menghapus data ini?') {
             const form = button.closest('form');
             Swal.fire({

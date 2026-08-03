@@ -34,6 +34,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/admin/bookings', [BookingController::class, 'store'])->name('admin.bookings.store');
     Route::put('/admin/bookings/{booking}', [BookingController::class, 'update'])->name('admin.bookings.update');
     Route::patch('/admin/bookings/{booking}/lunas', [BookingController::class, 'markAsLunas'])->name('admin.bookings.mark-lunas');
+    Route::get('/admin/bookings/{booking}/receipt', [BookingController::class, 'receipt'])->name('admin.bookings.receipt');
     Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])->name('admin.bookings.destroy');
     
     // Super Admin Only Routes

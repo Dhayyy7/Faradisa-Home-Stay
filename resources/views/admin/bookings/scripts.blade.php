@@ -54,6 +54,17 @@
         const waText = encodeURIComponent(`Halo Kak ${booking.customer_name}, mengenai pemesanan Kamar ${room ? room.name : ''} (${booking.booking_code})...`);
         document.getElementById('preview_wa_link').href = `https://wa.me/${formattedPhone}?text=${waText}`;
 
+        // Print Nota Link
+        const notaBtn = document.getElementById('preview_print_nota_btn');
+        if (notaBtn) {
+            if ([2, 3, 4].includes(booking.status)) {
+                notaBtn.href = `/admin/bookings/${booking.id}/receipt`;
+                notaBtn.style.display = 'inline-flex';
+            } else {
+                notaBtn.style.display = 'none';
+            }
+        }
+
         // Format dates
         const checkInDate = new Date(booking.check_in_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
         const checkOutDate = new Date(booking.check_out_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });

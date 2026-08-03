@@ -223,6 +223,29 @@
         background-color: #fca5a5;
     }
 
+    .btn-print-nota {
+        background-color: #fef3c7;
+        color: #b45309;
+        border: none;
+        padding: 0.35rem 0.6rem;
+        border-radius: 8px;
+        font-size: 0.78rem;
+        font-weight: 600;
+        cursor: pointer;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.3rem;
+        transition: all 0.2s;
+        width: 100%;
+        text-decoration: none;
+    }
+
+    .btn-print-nota:hover {
+        background-color: #fde68a;
+        color: #78350f;
+    }
+
     /* Modal Backdrop & Card */
     .modal-backdrop {
         position: fixed;
@@ -408,6 +431,13 @@
                                     <span>Lunas</span>
                                 </button>
                             </form>
+                            @endif
+
+                            @if(in_array($b->status, [2, 3, 4]))
+                            <a href="{{ route('admin.bookings.receipt', $b->id) }}" target="_blank" class="btn-print-nota" title="Cetak Nota Pembayaran">
+                                <i class="fa-solid fa-print"></i>
+                                <span>Nota</span>
+                            </a>
                             @endif
 
                             <button type="button" class="btn-preview" onclick="openPreviewModal({{ json_encode($b) }}, {{ json_encode($b->room) }})">

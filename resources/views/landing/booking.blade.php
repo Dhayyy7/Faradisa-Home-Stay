@@ -554,6 +554,71 @@
             margin-bottom: 0.4rem;
             color: var(--nusakos-text-muted);
         }
+
+        /* Responsive Breakpoints */
+        @media (max-width: 992px) {
+            .nusakos-container {
+                grid-template-columns: 1fr;
+                gap: 1.5rem;
+                padding-top: 1rem;
+            }
+
+            .gallery-main-wrapper {
+                height: 320px;
+            }
+
+            .price-sticky-card {
+                position: static;
+            }
+
+            .nusakos-header {
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 576px) {
+            .gallery-main-wrapper {
+                height: 240px;
+                border-radius: 14px;
+            }
+
+            .thumb-item {
+                width: 65px;
+                height: 50px;
+                border-radius: 8px;
+            }
+
+            .price-main {
+                font-size: 1.4rem;
+            }
+
+            .facility-card-box {
+                padding: 1.25rem;
+                border-radius: 16px;
+            }
+
+            .amenity-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 0.75rem;
+            }
+
+            .modal-content-card {
+                padding: 1.25rem;
+                border-radius: 16px;
+                margin: 0 10px;
+            }
+
+            .btn-book-now, .btn-tanya-wa {
+                padding: 0.85rem;
+                font-size: 0.9rem;
+            }
+
+            .carousel-nav-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 0.8rem;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1164,20 +1229,20 @@
             let extrasText = '';
             if (b.extra_facilities && b.extra_facilities.length > 0) {
                 const names = b.extra_facilities.map(x => `${x.name} (+Rp ${new Intl.NumberFormat('id-ID').format(x.price)})`).join(', ');
-                extrasText = `✨ *Extra Fasilitas*: ${names}\n`;
+                extrasText = `\u2728 *Extra Fasilitas*: ${names}\n`;
             }
 
             let waText = `Halo Admin {{ $setting->homestay_name ?? 'Faradisa HomeStay' }},\n\n` +
                          `Saya ingin mengonfirmasi *Pemesanan Kamar* dengan data berikut:\n\n` +
-                         `🆔 *Kode Booking*: *#${b.booking_code}*\n` +
-                         `📌 *Status*: Pending (Menunggu Pembayaran)\n` +
-                         `👤 *Nama Pemesan*: ${b.customer_name}\n` +
-                         `📱 *No. WhatsApp*: ${b.customer_phone}\n` +
-                         `🏨 *Kamar / Unit*: ${b.room_name} (${b.room_code})\n` +
-                         `📅 *Check-In*: ${formatIndoDate(b.check_in_date)}\n` +
-                         `📅 *Check-Out*: ${formatIndoDate(b.check_out_date)} (${b.total_nights} Malam)\n` +
+                         `\uD83C\uDD94 *Kode Booking*: *#${b.booking_code}*\n` +
+                         `\uD83D\uDCCD *Status*: Pending (Menunggu Pembayaran)\n` +
+                         `\uD83D\uDC64 *Nama Pemesan*: ${b.customer_name}\n` +
+                         `\uD83D\uDCF1 *No. WhatsApp*: ${b.customer_phone}\n` +
+                         `\uD83C\uDFE8 *Kamar / Unit*: ${b.room_name} (${b.room_code})\n` +
+                         `\uD83D\uDCC5 *Check-In*: ${formatIndoDate(b.check_in_date)}\n` +
+                         `\uD83D\uDCC5 *Check-Out*: ${formatIndoDate(b.check_out_date)} (${b.total_nights} Malam)\n` +
                          extrasText +
-                         `\n💰 *Total Biaya*: *Rp ${new Intl.NumberFormat('id-ID').format(b.total_price)}*\n\n` +
+                         `\n\uD83D\uDCB0 *Total Biaya*: *Rp ${new Intl.NumberFormat('id-ID').format(b.total_price)}*\n\n` +
                          `Mohon instruksi nomor rekening/pembayaran untuk penyelesaian reservasi ini. Terima kasih!`;
 
             const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;

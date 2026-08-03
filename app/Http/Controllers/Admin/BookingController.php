@@ -329,4 +329,13 @@ class BookingController extends Controller
 
         return redirect()->route('admin.bookings.index')->with('success', 'Status pemesanan ' . $booking->booking_code . ' berhasil diubah menjadi LUNAS!');
     }
+
+    /**
+     * Display printable receipt / nota for a booking (Lunas / DP / Selesai).
+     */
+    public function receipt(Booking $booking)
+    {
+        $setting = \App\Models\Setting::getSetting();
+        return view('admin.bookings.receipt', compact('booking', 'setting'));
+    }
 }
