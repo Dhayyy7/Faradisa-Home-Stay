@@ -26,6 +26,14 @@
     <!-- Custom Landing JavaScript -->
     <script src="/js/landing.js" defer></script>
 </head>
+@php
+    $setting = $setting ?? \App\Models\Setting::getSetting();
+    $rawWa = $setting->wa_number ?? '082232761695';
+    $waClean = preg_replace('/[^0-9]/', '', $rawWa);
+    if (str_starts_with($waClean, '0')) {
+        $waClean = '62' . substr($waClean, 1);
+    }
+@endphp
 <body>
 
     <!-- ==========================================

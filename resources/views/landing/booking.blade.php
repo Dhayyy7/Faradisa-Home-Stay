@@ -23,7 +23,9 @@
     <link rel="stylesheet" href="/css/landing.css">
 
     @php
-        $waClean = preg_replace('/[^0-9]/', '', $setting->wa_number ?? '6281234567890');
+        $setting = $setting ?? \App\Models\Setting::getSetting();
+        $rawWa = $setting->wa_number ?? '082232761695';
+        $waClean = preg_replace('/[^0-9]/', '', $rawWa);
         if (str_starts_with($waClean, '0')) {
             $waClean = '62' . substr($waClean, 1);
         }
@@ -1229,20 +1231,20 @@
             let extrasText = '';
             if (b.extra_facilities && b.extra_facilities.length > 0) {
                 const names = b.extra_facilities.map(x => `${x.name} (+Rp ${new Intl.NumberFormat('id-ID').format(x.price)})`).join(', ');
-                extrasText = `\u2728 *Extra Fasilitas*: ${names}\n`;
+                extrasText = `- *Extra Fasilitas*: ${names}\n`;
             }
 
             let waText = `Halo Admin {{ $setting->homestay_name ?? 'Faradisa HomeStay' }},\n\n` +
                          `Saya ingin mengonfirmasi *Pemesanan Kamar* dengan data berikut:\n\n` +
-                         `\uD83C\uDD94 *Kode Booking*: *#${b.booking_code}*\n` +
-                         `\uD83D\uDCCD *Status*: Pending (Menunggu Pembayaran)\n` +
-                         `\uD83D\uDC64 *Nama Pemesan*: ${b.customer_name}\n` +
-                         `\uD83D\uDCF1 *No. WhatsApp*: ${b.customer_phone}\n` +
-                         `\uD83C\uDFE8 *Kamar / Unit*: ${b.room_name} (${b.room_code})\n` +
-                         `\uD83D\uDCC5 *Check-In*: ${formatIndoDate(b.check_in_date)}\n` +
-                         `\uD83D\uDCC5 *Check-Out*: ${formatIndoDate(b.check_out_date)} (${b.total_nights} Malam)\n` +
+                         `- *Kode Booking*: *#${b.booking_code}*\n` +
+                         `- *Status*: Pending (Menunggu Pembayaran)\n` +
+                         `- *Nama Pemesan*: ${b.customer_name}\n` +
+                         `- *No. WhatsApp*: ${b.customer_phone}\n` +
+                         `- *Kamar / Unit*: ${b.room_name} (${b.room_code})\n` +
+                         `- *Check-In*: ${formatIndoDate(b.check_in_date)}\n` +
+                         `- *Check-Out*: ${formatIndoDate(b.check_out_date)} (${b.total_nights} Malam)\n` +
                          extrasText +
-                         `\n\uD83D\uDCB0 *Total Biaya*: *Rp ${new Intl.NumberFormat('id-ID').format(b.total_price)}*\n\n` +
+                         `\n*Total Biaya*: *Rp ${new Intl.NumberFormat('id-ID').format(b.total_price)}*\n\n` +
                          `Mohon instruksi nomor rekening/pembayaran untuk penyelesaian reservasi ini. Terima kasih!`;
 
             const waUrl = `https://wa.me/${waPhone}?text=${encodeURIComponent(waText)}`;

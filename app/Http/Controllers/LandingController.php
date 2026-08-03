@@ -16,12 +16,7 @@ class LandingController extends Controller
      */
     public function index()
     {
-        $setting = Setting::first() ?? new Setting([
-            'homestay_name' => 'Faradisa HomeStay',
-            'logo' => null,
-            'wa_number' => '6281234567890',
-            'media_assets' => [],
-        ]);
+        $setting = Setting::getSetting();
 
         $rooms = Room::with('facilities')->latest()->get();
         $extraFacilities = ExtraFacility::all();
@@ -36,12 +31,7 @@ class LandingController extends Controller
     {
         $room->load(['facilities', 'bookings']);
 
-        $setting = Setting::first() ?? new Setting([
-            'homestay_name' => 'Faradisa HomeStay',
-            'logo' => null,
-            'wa_number' => '6281234567890',
-            'media_assets' => [],
-        ]);
+        $setting = Setting::getSetting();
 
         $extraFacilities = ExtraFacility::all();
 
