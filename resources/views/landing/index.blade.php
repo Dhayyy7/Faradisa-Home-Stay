@@ -292,9 +292,9 @@
                                 @endif
 
                                 <!-- Badge Code Over Image -->
-                                <div class="badge-code">
+                                {{-- <div class="badge-code">
                                     {{ $room->code }}
-                                </div>
+                                </div> --}}
 
                                 <!-- Discount Badge if Any -->
                                 @if($room->discount && $room->discount > 0)
@@ -314,16 +314,6 @@
                                     <span class="stars"><i class="fa-solid fa-star"></i> 4.9</span>
                                     <span>•</span>
                                     <span>Rating Tamu Puas</span>
-                                </div>
-
-                                <!-- Room Qty Counter -->
-                                <div class="qty-box">
-                                    <span class="qty-label">Jumlah Kamar:</span>
-                                    <div class="qty-counter">
-                                        <button type="button" class="btn-qty" onclick="updateCardQty({{ $room->id }}, -1)">-</button>
-                                        <span id="qty_room_{{ $room->id }}" class="qty-num">1</span>
-                                        <button type="button" class="btn-qty" onclick="updateCardQty({{ $room->id }}, 1)">+</button>
-                                    </div>
                                 </div>
 
                                 <!-- Key Amenities Pills -->
@@ -355,10 +345,10 @@
                                 </div>
                             </div>
 
-                            <button type="button" onclick="openBookingModal({{ json_encode($room) }}, '{{ $setting->wa_number ?? '' }}')" class="btn-book-wa">
-                                <i class="fa-brands fa-whatsapp" style="font-size: 1rem; color: #4ade80;"></i>
-                                <span>Pesan via WhatsApp</span>
-                            </button>
+                            <a href="{{ route('booking', $room->id) }}" class="btn-book-now" style="width: 100%; padding: 0.9rem; border-radius: 12px; background-color: var(--primary, #c2410c); color: #ffffff; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 4px 15px rgba(194, 65, 12, 0.3); transition: all 0.25s ease;">
+                                <span>Pesan Sekarang</span>
+                                <i class="fa-solid fa-arrow-right"></i>
+                            </a>
                         </div>
                     </div>
                 @empty

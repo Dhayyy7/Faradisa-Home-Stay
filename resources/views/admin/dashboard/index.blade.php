@@ -125,6 +125,27 @@
         border-color: #4f46e5;
         background-color: #ffffff;
     }
+
+    .btn-report {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.45rem;
+        padding: 0.5rem 0.9rem;
+        border-radius: 10px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        border: none;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        text-decoration: none;
+    }
+
+    .btn-report:hover {
+        opacity: 0.9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
 </style>
 @endsection
 
@@ -203,17 +224,31 @@
                 </div>
             </div>
 
-            <!-- Month Filter Dropdown -->
-            <div style="display: flex; align-items: center; gap: 0.75rem;">
-                <label for="month_filter" style="font-size: 0.85rem; font-weight: 700; color: #334155;">Filter Bulan:</label>
-                <select id="month_filter" class="form-select-filter" onchange="updateChartData()">
-                    @for($m = 1; $m <= 12; $m++)
-                        @php $mStr = sprintf('%02d', $m); @endphp
-                        <option value="{{ $mStr }}" {{ $mStr == $currentMonth ? 'selected' : '' }}>
-                            {{ Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }} {{ $currentYear }}
-                        </option>
-                    @endfor
-                </select>
+            <!-- Month Filter & Report Download Dropdown -->
+            <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <label for="month_filter" style="font-size: 0.85rem; font-weight: 700; color: #334155;">Filter Bulan:</label>
+                    <select id="month_filter" class="form-select-filter" onchange="updateChartData()">
+                        @for($m = 1; $m <= 12; $m++)
+                            @php $mStr = sprintf('%02d', $m); @endphp
+                            <option value="{{ $mStr }}" {{ $mStr == $currentMonth ? 'selected' : '' }}>
+                                {{ Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }} {{ $currentYear }}
+                            </option>
+                        @endfor
+                    </select>
+                </div>
+
+                <!-- Report Export Action Buttons -->
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <button type="button" onclick="exportReport('pdf')" class="btn-report" style="background: #4f46e5; color: #ffffff;" title="Cetak Laporan Pemesanan PDF">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Cetak PDF</span>
+                    </button>
+                    <button type="button" onclick="exportReport('excel')" class="btn-report" style="background: #16a34a; color: #ffffff;" title="Unduh File CSV / Excel">
+                        <i class="fa-solid fa-file-excel"></i>
+                        <span>Excel / CSV</span>
+                    </button>
+                </div>
             </div>
         </div>
 
@@ -334,6 +369,19 @@
         .catch(error => {
             console.error('Error fetching chart data:', error);
         });
+    }
+
+    function exportReport(type) {
+        const selectedMonth = document.getElementById('month_filter').value;
+        const currentYear = '{{ $currentYear }}';
+
+        if (type === 'pdf') {
+            const url = `{{ route('admin.dashboard.report.pdf') }}?month=${selectedMonth}&year=${currentYear}`;
+            window.open(url, '_blank');
+        } else if (type === 'excel') {
+            const url = `{{ route('admin.dashboard.report.excel') }}?month=${selectedMonth}&year=${currentYear}`;
+            window.location.href = url;
+        }
     }
 </script>
 @endsection

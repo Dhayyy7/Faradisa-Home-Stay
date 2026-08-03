@@ -366,7 +366,7 @@
                                 <span>Preview</span>
                             </button>
 
-                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, {{ json_encode($room->facilities->pluck('id')->toArray()) }})">
+                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, {{ json_encode($room->facilities->pluck('id')->toArray()) }}, {{ json_encode($room->images ?? []) }})">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 <span>Edit</span>
                             </button>

@@ -17,9 +17,27 @@
                 <input type="text" id="edit_name" name="name" class="form-input" required>
             </div>
 
-            <div class="form-group">
-                <label for="edit_icon" class="form-label">Icon FontAwesome</label>
-                <input type="text" id="edit_icon" name="icon" class="form-input">
+            <div class="form-group" style="position: relative;">
+                <label for="edit_icon" class="form-label">Icon FontAwesome <span style="font-weight: 400; color: #64748b;">(Pilih rekomendasi / ketik nama ikon)</span></label>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <div id="icon_preview_edit" class="facility-icon-badge" style="flex-shrink: 0; background: #e0e7ff; color: #4f46e5;">
+                        <i class="fa-solid fa-check-circle"></i>
+                    </div>
+                    <input type="text" id="edit_icon" name="icon" class="form-input" placeholder="Ketik wifi, ac, tv, kasur..." autocomplete="off">
+                </div>
+
+                <!-- Quick Suggestion Pills -->
+                <div style="display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem;">
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-wifi', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-wifi"></i> Wi-Fi</span>
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-snowflake', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-snowflake"></i> AC</span>
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-tv', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-tv"></i> TV</span>
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-shower', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-shower"></i> Water Heater</span>
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-bed', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-bed"></i> Kasur</span>
+                    <span class="icon-quick-pill" onclick="selectIcon('fa-utensils', 'edit_icon', 'icon_preview_edit')"><i class="fa-solid fa-utensils"></i> Dapur</span>
+                </div>
+
+                <!-- Live Search Dropdown Popup -->
+                <div id="icon_suggestions_edit" class="icon-suggestion-dropdown"></div>
             </div>
 
             <div class="form-group">

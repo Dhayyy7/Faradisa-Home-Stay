@@ -162,9 +162,7 @@ function openBookingModal(room, waNumber) {
     activeBookingState.roomCode = room.code;
     activeBookingState.pricePerNight = parseFloat(room.final_price || room.price);
     activeBookingState.waNumber = waNumber || '6281234567890';
-
-    const qtyElem = document.getElementById(`qty_room_${room.id}`);
-    activeBookingState.qty = qtyElem ? parseInt(qtyElem.innerText) || 1 : 1;
+    activeBookingState.qty = 1;
 
     document.getElementById('modal_room_title').innerText = `${room.name} (${room.code})`;
     document.getElementById('modal_room_price').innerText = `Rp ${new Intl.NumberFormat('id-ID').format(activeBookingState.pricePerNight)} / malam`;
@@ -267,7 +265,6 @@ function submitBookingToWA() {
     let waText = `Halo Admin Faradisa HomeStay,\n\nSaya ingin melakukan *Pemesanan Kamar* dengan detail sebagai berikut:\n\n` +
                  `👤 *Nama Pemesan*: ${customerName}\n` +
                  `🏨 *Kamar / Unit*: ${activeBookingState.roomName} (${activeBookingState.roomCode})\n` +
-                 `🔢 *Jumlah Kamar*: ${activeBookingState.qty} Kamar\n` +
                  `📅 *Check-In*: ${formatIndoDate(checkInDate)}\n` +
                  `📅 *Check-Out*: ${formatIndoDate(checkOutDate)} (${totalNights} Malam)\n`;
 

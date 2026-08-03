@@ -15,6 +15,8 @@ use App\Http\Controllers\LandingController;
 
 // Homepage Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('home');
+Route::get('/room/{room}', [LandingController::class, 'booking'])->name('booking');
+Route::post('/room/booking/store', [LandingController::class, 'storeBooking'])->name('booking.store');
 
 // Authentication Routes
 Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
@@ -38,6 +40,8 @@ Route::middleware(['auth'])->group(function () {
     Route::middleware(['superadmin'])->group(function () {
         // Analytics Dashboard Route (Super Admin Only)
         Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+        Route::get('/admin/dashboard/report/pdf', [DashboardController::class, 'reportPdf'])->name('admin.dashboard.report.pdf');
+        Route::get('/admin/dashboard/report/excel', [DashboardController::class, 'reportExcel'])->name('admin.dashboard.report.excel');
         // Room & Unit Management Routes
         Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
         Route::post('/admin/rooms', [RoomController::class, 'store'])->name('admin.rooms.store');

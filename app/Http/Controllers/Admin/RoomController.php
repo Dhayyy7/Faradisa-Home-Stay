@@ -100,6 +100,7 @@ class RoomController extends Controller
             'facilities.*' => ['exists:facilities,id'],
             'images' => ['nullable', 'array', 'max:5'],
             'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
+            'deleted_images' => ['nullable', 'array'],
         ], [
             'code.required' => 'Kode Kamar wajib diisi.',
             'code.unique' => 'Kode Kamar sudah terdaftar.',
@@ -109,22 +110,36 @@ class RoomController extends Controller
             'images.max' => 'Maksimal 5 foto kamar yang dapat diunggah.',
         ]);
 
-        $imagePaths = $room->images ?? [];
+        $imagePaths = is_array($room->images) ? array_values($room->images) : [];
+
+        // Process deleted images
+        if ($request->has('deleted_images')) {
+            $deletedImages = $request->input('deleted_images', []);
+            foreach ($deletedImages as $delPath) {
+                $fullPath = public_path($delPath);
+                if (File::exists($fullPath)) {
+                    File::delete($fullPath);
+                }
+                $imagePaths = array_values(array_filter($imagePaths, fn($p) => $p !== $delPath));
+            }
+        }
+
+        // Process newly uploaded images
         if ($request->hasFile('images')) {
             $uploadPath = public_path('uploads/rooms');
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
             }
 
-            $newImagePaths = [];
             foreach ($request->file('images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move($uploadPath, $filename);
-                $newImagePaths[] = 'uploads/rooms/' . $filename;
+                $imagePaths[] = 'uploads/rooms/' . $filename;
             }
-            // Replace or append up to 5 images
-            $imagePaths = array_slice(array_merge($imagePaths, $newImagePaths), -5);
         }
+
+        // Keep up to 5 images
+        $imagePaths = array_slice(array_values($imagePaths), 0, 5);
 
         $room->update([
             'code' => strtoupper($request->input('code')),

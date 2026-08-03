@@ -44,6 +44,17 @@
                 </div>
             </div>
 
+            <!-- Existing Photos Preview Grid with Delete Buttons -->
+            <div class="form-group">
+                <label class="form-label">Foto Kamar Saat Ini <span style="font-weight: 400; color: #64748b;">(Klik tombol sampah untuk menghapus foto)</span></label>
+                <div id="edit_existing_images_container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(95px, 1fr)); gap: 0.75rem; background: #f8fafc; padding: 0.85rem; border-radius: 12px; border: 1px solid #e2e8f0; min-height: 50px;">
+                    <!-- Rendered by JS -->
+                </div>
+                <div id="edit_deleted_inputs_container">
+                    <!-- Hidden inputs for deleted_images[] -->
+                </div>
+            </div>
+
             <div class="form-group">
                 <label for="edit_images" class="form-label">Unggah Foto Baru <span style="font-weight: 400; color: #64748b;">(Maksimal 5 Foto)</span></label>
                 <input type="file" id="edit_images" name="images[]" class="form-input" multiple accept="image/*">

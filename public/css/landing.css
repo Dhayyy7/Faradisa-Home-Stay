@@ -953,15 +953,16 @@ body.dark-mode .nusakos-map-box {
     font-weight: 600;
 }
 
-.btn-book-wa {
+.btn-book-wa,
+.btn-book-now {
     width: 100%;
     padding: 0.9rem;
     border-radius: 12px;
     background-color: var(--primary);
     color: #ffffff;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     font-weight: 800;
-    letter-spacing: 0.08em;
+    letter-spacing: 0.05em;
     text-transform: uppercase;
     border: none;
     cursor: pointer;
@@ -973,9 +974,18 @@ body.dark-mode .nusakos-map-box {
     transition: all 0.25s ease;
 }
 
-.btn-book-wa:hover {
+.btn-book-wa:hover,
+.btn-book-now:hover {
     background-color: var(--primary-hover);
     box-shadow: 0 8px 20px rgba(194, 65, 12, 0.4);
+}
+
+.btn-book-now i {
+    transition: transform 0.25s ease;
+}
+
+.btn-book-now:hover i {
+    transform: translateX(4px);
 }
 
 /* ==========================================

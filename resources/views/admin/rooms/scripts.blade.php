@@ -7,7 +7,7 @@
         document.getElementById('createRoomModal').classList.remove('show');
     }
 
-    function openEditModal(id, code, name, price, discount, selectedFacilityIds) {
+    function openEditModal(id, code, name, price, discount, selectedFacilityIds, roomImages) {
         const form = document.getElementById('editForm');
         form.action = `/admin/rooms/${id}`;
 
@@ -21,7 +21,88 @@
             cb.checked = selectedFacilityIds.includes(parseInt(cb.value));
         });
 
+        // Reset deleted images inputs & new file input
+        const deletedContainer = document.getElementById('edit_deleted_inputs_container');
+        if(deletedContainer) deletedContainer.innerHTML = '';
+        const editImagesInput = document.getElementById('edit_images');
+        if(editImagesInput) editImagesInput.value = '';
+
+        // Render Existing Room Photos with Delete Buttons
+        renderEditExistingImages(roomImages || []);
+
         document.getElementById('editModal').classList.add('show');
+    }
+
+    function renderEditExistingImages(images) {
+        const container = document.getElementById('edit_existing_images_container');
+        if (!container) return;
+        container.innerHTML = '';
+
+        if (images && Array.isArray(images) && images.length > 0) {
+            images.forEach((imgPath, index) => {
+                const wrapper = document.createElement('div');
+                wrapper.style.position = 'relative';
+                wrapper.style.borderRadius = '10px';
+                wrapper.style.overflow = 'hidden';
+                wrapper.style.border = '1px solid #cbd5e1';
+                wrapper.style.height = '85px';
+
+                wrapper.innerHTML = `
+                    <img src="/${imgPath}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <button type="button" onclick="markImageForDeletion('${imgPath}', this)" 
+                            style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); transition: transform 0.15s ease;"
+                            onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
+                            title="Hapus Foto Ini">
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                `;
+                container.appendChild(wrapper);
+            });
+        } else {
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 0.8rem; font-style: italic; padding: 0.5rem 0;">
+                    Belum ada foto kamar yang diunggah.
+                </div>
+            `;
+        }
+    }
+
+    function markImageForDeletion(imgPath, btnElem) {
+        Swal.fire({
+            title: 'Hapus Foto Ini?',
+            text: 'Foto ini akan dihapus saat Anda menyimpan perubahan.',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmColor: '#ef4444',
+            cancelColor: '#64748b',
+            confirmButtonText: 'Ya, Hapus',
+            cancelButtonText: 'Batal'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                // Append hidden input for deleted image
+                const hiddenInput = document.createElement('input');
+                hiddenInput.type = 'hidden';
+                hiddenInput.name = 'deleted_images[]';
+                hiddenInput.value = imgPath;
+                document.getElementById('edit_deleted_inputs_container').appendChild(hiddenInput);
+
+                // Remove wrapper element from DOM
+                const wrapper = btnElem.closest('div');
+                if (wrapper) {
+                    wrapper.remove();
+                }
+
+                // Check if container is empty
+                const container = document.getElementById('edit_existing_images_container');
+                if (container && container.querySelectorAll('div').length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1 / -1; text-align: center; color: #94a3b8; font-size: 0.8rem; font-style: italic; padding: 0.5rem 0;">
+                            Belum ada foto kamar yang diunggah.
+                        </div>
+                    `;
+                }
+            }
+        });
     }
 
     function closeEditModal() {
