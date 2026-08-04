@@ -33,6 +33,13 @@
             </div>
         </div>
 
+        <div style="margin-bottom: 1.25rem;">
+            <label class="form-label">Keterangan / Deskripsi Kamar</label>
+            <div id="preview_description" style="font-size: 0.875rem; color: #334155; background: #f8fafc; padding: 0.85rem; border-radius: 10px; border: 1px solid #e2e8f0; line-height: 1.5; white-space: pre-line;">
+                <!-- Loaded via JS -->
+            </div>
+        </div>
+
         <div>
             <label class="form-label">Fasilitas Terpasang</label>
             <div id="preview_facilities_container" style="display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.5rem;">

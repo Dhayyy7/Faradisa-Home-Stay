@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\SoftDeletes;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
 
-#[Fillable(['code', 'name', 'price', 'discount', 'images'])]
+#[Fillable(['code', 'name', 'price', 'discount', 'description', 'images'])]
 class Room extends Model
 {
     use HasFactory, SoftDeletes;

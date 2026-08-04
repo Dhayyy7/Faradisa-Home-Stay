@@ -7,7 +7,7 @@
         document.getElementById('createRoomModal').classList.remove('show');
     }
 
-    function openEditModal(id, code, name, price, discount, selectedFacilityIds, roomImages) {
+    function openEditModal(id, code, name, price, discount, description, selectedFacilityIds, roomImages) {
         const form = document.getElementById('editForm');
         form.action = `/admin/rooms/${id}`;
 
@@ -15,6 +15,7 @@
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_price').value = price;
         document.getElementById('edit_discount').value = discount > 0 ? discount : '';
+        document.getElementById('edit_description').value = description || '';
 
         // Reset all facility checkboxes
         document.querySelectorAll('.edit-facility-checkbox').forEach(cb => {
@@ -115,6 +116,11 @@
         document.getElementById('preview_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(room.price);
         document.getElementById('preview_discount').innerText = room.discount && room.discount > 0 ? room.discount + '%' : 'Tidak Ada';
         document.getElementById('preview_final_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(finalPrice);
+
+        const descElem = document.getElementById('preview_description');
+        if (descElem) {
+            descElem.innerText = room.description && room.description.trim() !== '' ? room.description : 'Belum ada keterangan untuk kamar ini.';
+        }
 
         // Render Photos
         const imgContainer = document.getElementById('preview_images_container');

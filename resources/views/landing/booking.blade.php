@@ -683,8 +683,21 @@
             </div>
             @endif
 
+            <!-- Room Description -->
+            @if(!empty($room->description))
+            <div class="facility-card-box" style="margin-top: 1.5rem;">
+                <div class="facility-title">
+                    <i class="fa-solid fa-align-left" style="color: var(--nusakos-brown);"></i>
+                    <span>Keterangan Kamar</span>
+                </div>
+                <div style="font-size: 0.9rem; color: var(--nusakos-text-dark); line-height: 1.65; white-space: pre-line;">
+                    {{ $room->description }}
+                </div>
+            </div>
+            @endif
+
             <!-- Room Facilities -->
-            <div class="facility-card-box">
+            <div class="facility-card-box" style="{{ !empty($room->description) ? 'margin-top: 1.5rem;' : '' }}">
                 <div class="facility-title">
                     <i class="fa-solid fa-wand-magic-sparkles" style="color: var(--nusakos-brown);"></i>
                     <span>Fasilitas Kamar</span>

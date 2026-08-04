@@ -33,6 +33,11 @@
             </div>
 
             <div class="form-group">
+                <label for="edit_description" class="form-label">Keterangan / Deskripsi Kamar <span style="font-weight: 400; color: #64748b;">(Opsional)</span></label>
+                <textarea id="edit_description" name="description" class="form-input" rows="3" placeholder="Masukan keterangan atau deskripsi rinci kamar/unit..." style="resize: vertical;"></textarea>
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Fasilitas Kamar (Pilih Banyak)</label>
                 <div class="facility-checkbox-grid">
                     @foreach($facilities as $f)

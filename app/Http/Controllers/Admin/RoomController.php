@@ -44,6 +44,7 @@ class RoomController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
             'images' => ['nullable', 'array', 'max:5'],
@@ -76,6 +77,7 @@ class RoomController extends Controller
             'name' => $request->input('name'),
             'price' => $request->input('price'),
             'discount' => $request->input('discount'),
+            'description' => $request->input('description'),
             'images' => $imagePaths,
         ]);
 
@@ -96,6 +98,7 @@ class RoomController extends Controller
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
             'images' => ['nullable', 'array', 'max:5'],
@@ -146,6 +149,7 @@ class RoomController extends Controller
             'name' => $request->input('name'),
             'price' => $request->input('price'),
             'discount' => $request->input('discount'),
+            'description' => $request->input('description'),
             'images' => $imagePaths,
         ]);
 

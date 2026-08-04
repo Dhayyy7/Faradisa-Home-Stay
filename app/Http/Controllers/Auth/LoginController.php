@@ -17,7 +17,7 @@ class LoginController extends Controller
             if (Auth::user()->role_user === 'Super Admin') {
                 return redirect()->route('admin.dashboard');
             }
-            return redirect()->route('admin.bookings.index');
+            return redirect()->route('admin.rooms.details');
         }
 
         return view('auth.login');
@@ -49,8 +49,13 @@ class LoginController extends Controller
         if (Auth::attempt($attemptCredentials, $remember)) {
             $request->session()->regenerate();
 
-            return redirect()->intended(route('admin.dashboard'))
-                ->with('success', 'Selamat datang kembali, ' . Auth::user()->name . '!');
+            $user = Auth::user();
+            $targetRoute = ($user->role_user === 'Super Admin')
+                ? route('admin.dashboard')
+                : route('admin.rooms.details');
+
+            return redirect()->intended($targetRoute)
+                ->with('success', 'Selamat datang kembali, ' . $user->name . '!');
         }
 
         return back()->withErrors([

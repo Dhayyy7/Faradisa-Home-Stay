@@ -306,6 +306,7 @@
                     <th>#</th>
                     <th>Foto</th>
                     <th>Kode & Nama Kamar</th>
+                    <th>Keterangan</th>
                     <th>Harga Normal</th>
                     <th>Diskon</th>
                     <th>Fasilitas</th>
@@ -333,6 +334,15 @@
                     <td>
                         <div><span class="badge-code">{{ $room->code }}</span></div>
                         <div style="font-weight: 700; color: #1e293b; margin-top: 0.25rem;">{{ $room->name }}</div>
+                    </td>
+                    <td>
+                        @if(!empty($room->description))
+                        <div style="font-size: 0.8rem; color: #475569; max-width: 170px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; line-height: 1.35;" title="{{ $room->description }}">
+                            {{ $room->description }}
+                        </div>
+                        @else
+                        <span style="color: #94a3b8; font-style: italic; font-size: 0.8rem;">-</span>
+                        @endif
                     </td>
                     <td>
                         <div style="font-weight: 700; color: #0f172a;">Rp {{ number_format($room->price, 0, ',', '.') }}</div>
@@ -366,7 +376,7 @@
                                 <span>Preview</span>
                             </button>
 
-                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, {{ json_encode($room->facilities->pluck('id')->toArray()) }}, {{ json_encode($room->images ?? []) }})">
+                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, '{{ addslashes(str_replace(array("\r", "\n"), array('\r', '\n'), $room->description ?? '')) }}', {{ json_encode($room->facilities->pluck('id')->toArray()) }}, {{ json_encode($room->images ?? []) }})">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 <span>Edit</span>
                             </button>
