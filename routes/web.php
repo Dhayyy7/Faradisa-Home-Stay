@@ -16,6 +16,7 @@ use App\Http\Controllers\LandingController;
 
 // Homepage Landing Page
 Route::get('/', [LandingController::class, 'index'])->name('home');
+Route::get('/check-room', [LandingController::class, 'checkRoom'])->name('check-room');
 Route::get('/room/{room}', [LandingController::class, 'booking'])->name('booking');
 Route::post('/room/booking/store', [LandingController::class, 'storeBooking'])->name('booking.store');
 

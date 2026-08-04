@@ -25,6 +25,26 @@ class LandingController extends Controller
     }
 
     /**
+     * Display real-time availability calendar for all rooms/units.
+     */
+    public function checkRoom(Request $request)
+    {
+        $setting = Setting::getSetting();
+
+        $calMonth = sprintf('%02d', (int) $request->input('cal_month', date('m')));
+        $calYear = (int) $request->input('cal_year', date('Y'));
+
+        $rooms = Room::with(['facilities', 'bookings' => function($q) {
+            $q->whereIn('status', [1, 2, 4]);
+        }])->latest()->get();
+
+        $holidayService = app(\App\Services\HolidayService::class);
+        $holidayDates = $holidayService->getHolidayDates($calYear);
+
+        return view('landing.check-room', compact('rooms', 'setting', 'holidayDates', 'calMonth', 'calYear'));
+    }
+
+    /**
      * Display the room booking detail page.
      */
     public function booking(Room $room)
@@ -111,7 +131,7 @@ class LandingController extends Controller
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
         $bookingCode = $baseCode;
         $counter = 1;
-        while (Booking::where('booking_code', $bookingCode)->exists()) {
+        while (Booking::withTrashed()->where('booking_code', $bookingCode)->exists()) {
             $bookingCode = $baseCode . '-' . $counter;
             $counter++;
         }

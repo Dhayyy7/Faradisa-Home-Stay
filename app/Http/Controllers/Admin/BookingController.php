@@ -126,21 +126,22 @@ class BookingController extends Controller
         $checkIn = Carbon::parse($checkInStr);
         $checkOut = Carbon::parse($checkOutStr);
 
-        $totalNights = max(1, $checkIn->diffInDays($checkOut));
-        
+        // Calculate dynamic room total price based on Weekday vs Weekend/Holiday nights
+        $bookingDetails = $room->calculateBookingDetails($checkInStr, $checkOutStr);
+        $totalNights = $bookingDetails['total_nights'];
+        $roomTotalPrice = $bookingDetails['total_final_price'];
+
         // Code format: Kode Kamar + Tanggal Check-in YYYYMMDD (e.g. P1V120260729)
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
         $bookingCode = $baseCode;
         $counter = 1;
-        while (Booking::where('booking_code', $bookingCode)->exists()) {
+        while (Booking::withTrashed()->where('booking_code', $bookingCode)->exists()) {
             $bookingCode = $baseCode . '-' . $counter;
             $counter++;
         }
 
         $roomPrice = $room->price;
         $discount = $room->discount; // percent % from room if available, else null
-        $finalPricePerNight = $room->final_price;
-        $roomTotalPrice = $finalPricePerNight * $totalNights;
 
         // Process selected Extra Facilities
         $selectedExtraIds = $request->input('extra_facility_ids', []);
@@ -242,7 +243,10 @@ class BookingController extends Controller
         $checkIn = Carbon::parse($checkInStr);
         $checkOut = Carbon::parse($checkOutStr);
 
-        $totalNights = max(1, $checkIn->diffInDays($checkOut));
+        // Calculate dynamic room total price based on Weekday vs Weekend/Holiday nights
+        $bookingDetails = $room->calculateBookingDetails($checkInStr, $checkOutStr);
+        $totalNights = $bookingDetails['total_nights'];
+        $roomTotalPrice = $bookingDetails['total_final_price'];
 
         // Recalculate code if room or checkin date changed
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
@@ -250,7 +254,7 @@ class BookingController extends Controller
         if (!str_starts_with($bookingCode, $baseCode)) {
             $bookingCode = $baseCode;
             $counter = 1;
-            while (Booking::where('booking_code', $bookingCode)->where('id', '!=', $booking->id)->exists()) {
+            while (Booking::withTrashed()->where('booking_code', $bookingCode)->where('id', '!=', $booking->id)->exists()) {
                 $bookingCode = $baseCode . '-' . $counter;
                 $counter++;
             }
@@ -258,8 +262,6 @@ class BookingController extends Controller
 
         $roomPrice = $room->price;
         $discount = $room->discount;
-        $finalPricePerNight = $room->final_price;
-        $roomTotalPrice = $finalPricePerNight * $totalNights;
 
         // Process selected Extra Facilities
         $selectedExtraIds = $request->input('extra_facility_ids', []);
