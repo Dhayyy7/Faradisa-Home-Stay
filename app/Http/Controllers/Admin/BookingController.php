@@ -104,9 +104,9 @@ class BookingController extends Controller
         $checkInStr = $request->input('check_in_date');
         $checkOutStr = $request->input('check_out_date');
 
-        // Check availability for overlaps with active bookings (status 1, 2, or 4)
+        // Check availability for overlaps with active bookings (status 1, 2, 3, or 4)
         $isConflict = Booking::where('room_id', $roomId)
-            ->whereIn('status', [1, 2, 4])
+            ->whereIn('status', [1, 2, 3, 4])
             ->where(function ($q) {
                 $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
             })
@@ -218,11 +218,11 @@ class BookingController extends Controller
 
         $newStatus = (int) $request->input('status');
 
-        // If status is active (1, 2, or 4), check for conflicts with OTHER active bookings
-        if (in_array($newStatus, [1, 2, 4])) {
+        // If status is active (1, 2, 3, or 4), check for conflicts with OTHER active bookings
+        if (in_array($newStatus, [1, 2, 3, 4])) {
             $isConflict = Booking::where('room_id', $roomId)
                 ->where('id', '!=', $booking->id)
-                ->whereIn('status', [1, 2, 4])
+                ->whereIn('status', [1, 2, 3, 4])
                 ->where(function ($q) {
                     $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
                 })

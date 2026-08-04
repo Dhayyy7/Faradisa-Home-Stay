@@ -17,7 +17,7 @@ class DashboardController extends Controller
     {
         // 1. Calculate Real Stat Metrics
         $totalRooms = Room::count();
-        $activeBookings = Booking::whereIn('status', [1, 2, 4])->count();
+        $activeBookings = Booking::whereIn('status', [1, 2, 3, 4])->count();
         $pendingCount = Booking::where('status', 1)->count();
 
         $currentMonth = $request->input('month', date('m'));

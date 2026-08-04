@@ -35,7 +35,7 @@ class LandingController extends Controller
         $calYear = (int) $request->input('cal_year', date('Y'));
 
         $rooms = Room::with(['facilities', 'bookings' => function($q) {
-            $q->whereIn('status', [1, 2, 4]);
+            $q->whereIn('status', [1, 2, 3, 4]);
         }])->latest()->get();
 
         $holidayService = app(\App\Services\HolidayService::class);
@@ -58,7 +58,7 @@ class LandingController extends Controller
         // Calculate booked dates for availability calendar
         $bookedDates = [];
         foreach ($room->bookings as $b) {
-            if (in_array($b->status, [1, 2, 4]) && $b->check_in_date && $b->check_out_date) {
+            if (in_array($b->status, [1, 2, 3, 4]) && $b->check_in_date && $b->check_out_date) {
                 $curr = Carbon::parse($b->check_in_date);
                 $end = Carbon::parse($b->check_out_date);
                 while ($curr < $end) {
@@ -99,9 +99,9 @@ class LandingController extends Controller
         $checkInStr = $validated['check_in_date'];
         $checkOutStr = $validated['check_out_date'];
 
-        // Check availability conflict with active bookings (status 1, 2, 4)
+        // Check availability conflict with active bookings (status 1, 2, 3, 4)
         $isConflict = Booking::where('room_id', $roomId)
-            ->whereIn('status', [1, 2, 4])
+            ->whereIn('status', [1, 2, 3, 4])
             ->where(function ($q) {
                 $q->whereNull('expired_at')->orWhere('expired_at', '>', now());
             })

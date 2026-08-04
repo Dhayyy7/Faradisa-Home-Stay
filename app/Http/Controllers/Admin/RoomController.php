@@ -28,7 +28,7 @@ class RoomController extends Controller
     public function details(Request $request)
     {
         $rooms = Room::with(['facilities', 'bookings' => function($q) {
-            $q->whereIn('status', [1, 2, 4]);
+            $q->whereIn('status', [1, 2, 3, 4]);
         }])->latest()->get();
 
         $calYear = (int) $request->input('cal_year', date('Y'));
