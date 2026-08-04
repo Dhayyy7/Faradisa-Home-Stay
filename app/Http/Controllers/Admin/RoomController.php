@@ -31,7 +31,12 @@ class RoomController extends Controller
             $q->whereIn('status', [1, 2, 4]);
         }])->latest()->get();
 
-        return view('admin.rooms.details', compact('rooms'));
+        $calYear = (int) $request->input('cal_year', date('Y'));
+        $holidayService = app(\App\Services\HolidayService::class);
+        $holidayDates = $holidayService->getHolidayDates($calYear);
+        $allHolidays = \App\Models\Holiday::orderBy('date', 'desc')->get();
+
+        return view('admin.rooms.details', compact('rooms', 'holidayDates', 'allHolidays'));
     }
 
     /**
@@ -43,7 +48,9 @@ class RoomController extends Controller
             'code' => ['required', 'string', 'max:50', 'unique:rooms,code'],
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'weekend_price' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
             'images' => ['nullable', 'array', 'max:5'],
@@ -75,7 +82,9 @@ class RoomController extends Controller
             'code' => strtoupper($request->input('code')),
             'name' => $request->input('name'),
             'price' => $request->input('price'),
+            'weekend_price' => $request->input('weekend_price'),
             'discount' => $request->input('discount'),
+            'description' => $request->input('description'),
             'images' => $imagePaths,
         ]);
 
@@ -95,7 +104,9 @@ class RoomController extends Controller
             'code' => ['required', 'string', 'max:50', Rule::unique('rooms', 'code')->ignore($room->id)],
             'name' => ['required', 'string', 'max:255'],
             'price' => ['required', 'numeric', 'min:0'],
+            'weekend_price' => ['nullable', 'numeric', 'min:0'],
             'discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
+            'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
             'images' => ['nullable', 'array', 'max:5'],
@@ -145,7 +156,9 @@ class RoomController extends Controller
             'code' => strtoupper($request->input('code')),
             'name' => $request->input('name'),
             'price' => $request->input('price'),
+            'weekend_price' => $request->input('weekend_price'),
             'discount' => $request->input('discount'),
+            'description' => $request->input('description'),
             'images' => $imagePaths,
         ]);
 

@@ -18,7 +18,7 @@ class SuperAdminMiddleware
             if ($request->expectsJson()) {
                 return response()->json(['message' => 'Akses ditolak. Hanya Super Admin yang diizinkan.'], 403);
             }
-            return redirect()->route('admin.dashboard')->with('error', 'Akses ditolak. Halaman ini hanya dapat diakses oleh Super Admin.');
+            return redirect()->route('admin.rooms.details')->with('error', 'Akses ditolak. Halaman ini hanya dapat diakses oleh Super Admin.');
         }
 
         return $next($request);

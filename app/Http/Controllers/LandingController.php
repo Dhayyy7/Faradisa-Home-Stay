@@ -48,7 +48,15 @@ class LandingController extends Controller
             }
         }
 
-        return view('landing.booking', compact('setting', 'room', 'extraFacilities', 'bookedDates'));
+        // Get National Holiday Dates (Current & Next Year)
+        $holidayService = app(\App\Services\HolidayService::class);
+        $currentYear = (int) date('Y');
+        $holidayDates = array_values(array_unique(array_merge(
+            $holidayService->getHolidayDates($currentYear),
+            $holidayService->getHolidayDates($currentYear + 1)
+        )));
+
+        return view('landing.booking', compact('setting', 'room', 'extraFacilities', 'bookedDates', 'holidayDates'));
     }
 
     /**
@@ -94,7 +102,10 @@ class LandingController extends Controller
         $checkIn = Carbon::parse($checkInStr);
         $checkOut = Carbon::parse($checkOutStr);
 
-        $totalNights = max(1, $checkIn->diffInDays($checkOut));
+        // Calculate dynamic stay details (weekday vs weekend/holiday)
+        $stayDetails = $room->calculateBookingDetails($checkInStr, $checkOutStr);
+        $totalNights = $stayDetails['total_nights'];
+        $roomTotalPrice = $stayDetails['total_final_price'];
 
         // Generate Booking Code: RoomCode + YYYYMMDD
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
@@ -107,8 +118,6 @@ class LandingController extends Controller
 
         $roomPrice = $room->price;
         $discount = $room->discount;
-        $finalPricePerNight = $room->final_price;
-        $roomTotalPrice = $finalPricePerNight * $totalNights;
 
         // Process Extra Facilities
         $selectedExtraIds = $request->input('extra_facility_ids', []);

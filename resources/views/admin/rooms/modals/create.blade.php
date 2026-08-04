@@ -21,14 +21,25 @@
                 <input type="text" id="name" name="name" class="form-input" placeholder="Masukan Nama Kamar" required>
             </div>
 
-            <div class="form-group">
-                <label for="price" class="form-label">Harga per Malam (Rp)</label>
-                <input type="number" id="price" name="price" class="form-input" placeholder="Masukan Harga Kamar" min="0" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="price" class="form-label">Harga Weekday (Senin-Kamis)</label>
+                    <input type="number" id="price" name="price" class="form-input" placeholder="Harga per malam" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="weekend_price" class="form-label">Harga Weekend & Libur</label>
+                    <input type="number" id="weekend_price" name="weekend_price" class="form-input" placeholder="Opsional (Jum, Sab, Ming)" min="0">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="discount" class="form-label">Diskon (%) <span style="font-weight: 400; color: #64748b;">(Persen, Opsional)</span></label>
                 <input type="number" id="discount" name="discount" class="form-input" placeholder="Masukan Diskon (misal: 10 untuk 10%)" min="0" max="100" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label for="description" class="form-label">Keterangan / Deskripsi Kamar <span style="font-weight: 400; color: #64748b;">(Opsional)</span></label>
+                <textarea id="description" name="description" class="form-input" rows="3" placeholder="Masukan keterangan atau deskripsi rinci kamar/unit..." style="resize: vertical;"></textarea>
             </div>
 
             <div class="form-group">

@@ -22,14 +22,25 @@
                 <input type="text" id="edit_name" name="name" class="form-input" required>
             </div>
 
-            <div class="form-group">
-                <label for="edit_price" class="form-label">Harga (Rp)</label>
-                <input type="number" id="edit_price" name="price" class="form-input" min="0" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="edit_price" class="form-label">Harga Weekday (Senin-Kamis)</label>
+                    <input type="number" id="edit_price" name="price" class="form-input" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_weekend_price" class="form-label">Harga Weekend & Libur</label>
+                    <input type="number" id="edit_weekend_price" name="weekend_price" class="form-input" min="0" placeholder="Opsional">
+                </div>
             </div>
 
             <div class="form-group">
                 <label for="edit_discount" class="form-label">Diskon (%)</label>
                 <input type="number" id="edit_discount" name="discount" class="form-input" min="0" max="100" step="0.1">
+            </div>
+
+            <div class="form-group">
+                <label for="edit_description" class="form-label">Keterangan / Deskripsi Kamar <span style="font-weight: 400; color: #64748b;">(Opsional)</span></label>
+                <textarea id="edit_description" name="description" class="form-input" rows="3" placeholder="Masukan keterangan atau deskripsi rinci kamar/unit..." style="resize: vertical;"></textarea>
             </div>
 
             <div class="form-group">

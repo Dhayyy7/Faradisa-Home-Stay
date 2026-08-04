@@ -5,6 +5,67 @@
 
 @section('styles')
 <style>
+    /* Modal Styles */
+    .modal-backdrop {
+        position: fixed;
+        inset: 0;
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(4px);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 1000;
+        opacity: 0;
+        visibility: hidden;
+        transition: all 0.25s ease;
+    }
+
+    .modal-backdrop.show {
+        opacity: 1;
+        visibility: visible;
+    }
+
+    .modal-card {
+        background: #ffffff;
+        width: 100%;
+        max-width: 620px;
+        border-radius: 20px;
+        padding: 1.75rem;
+        box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+        transform: translateY(20px);
+        transition: transform 0.25s ease;
+    }
+
+    .modal-backdrop.show .modal-card {
+        transform: translateY(0);
+    }
+
+    .modal-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        margin-bottom: 1.25rem;
+    }
+
+    .modal-title {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #0f172a;
+    }
+
+    .btn-close-modal {
+        background: #f1f5f9;
+        color: #64748b;
+        border: none;
+        width: 32px;
+        height: 32px;
+        border-radius: 50%;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
     /* Room Detail & Calendar Cards Grid */
     .room-cards-grid {
         display: grid;
@@ -55,6 +116,13 @@
         background-color: #f0fdf4;
         color: #16a34a;
         border: 1px solid #bbf7d0;
+    }
+
+    .day-weekend {
+        background-color: #f3e8ff;
+        color: #7e22ce;
+        border: 1px solid #c084fc;
+        font-weight: 800;
     }
 
     .day-booked {
@@ -128,11 +196,10 @@
                 Detail Kamar & Kalender Ketersediaan Booking
             </h2>
             <div style="font-size: 0.8rem; color: #64748b; margin-top: 0.2rem;">
-                Tanggal terbooking ditandai <span style="color: #dc2626; font-weight: 700;">(X) Merah</span>. <strong>Klik tanggal merah</strong> untuk langsung membuka detail pesanannya.
+                Tanggal terbooking ditandai <span style="color: #dc2626; font-weight: 700;">(X) Merah</span>. Hari <span style="color: #7e22ce; font-weight: 700;">Weekend & Tgl Merah</span> ditandai <span style="color: #7e22ce; font-weight: 700;">Ungu</span>. <strong>Klik tanggal merah</strong> untuk membuka detail pemesanan.
             </div>
         </div>
 
-        <!-- Month Filter Form -->
         @php
             $calMonth = request('cal_month', date('m'));
             $calYear = request('cal_year', date('Y'));
@@ -141,16 +208,24 @@
             $startOffset = $firstDay->dayOfWeek; // 0 = Sunday
         @endphp
 
-        <form action="{{ route('admin.rooms.details') }}" method="GET" style="display: flex; align-items: center; gap: 0.5rem;">
-            <select name="cal_month" class="form-select" style="width: auto; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 600;" onchange="this.form.submit()">
-                @for($m = 1; $m <= 12; $m++)
-                    @php $mStr = sprintf('%02d', $m); @endphp
-                    <option value="{{ $mStr }}" {{ $mStr == $calMonth ? 'selected' : '' }}>
-                        {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }} {{ $calYear }}
-                    </option>
-                @endfor
-            </select>
-        </form>
+        <div style="display: flex; align-items: center; gap: 0.75rem;">
+            <button type="button" class="btn-submit" style="background-color: #7e22ce; width: auto; padding: 0.45rem 0.95rem; font-size: 0.8rem; box-shadow: 0 4px 12px rgba(126, 34, 206, 0.3);" onclick="openHolidayModal()">
+                <i class="fa-solid fa-calendar-plus"></i>
+                <span>Kelola Libur / Rate Weekend Khusus</span>
+            </button>
+
+            <!-- Month Filter Form -->
+            <form action="{{ route('admin.rooms.details') }}" method="GET" style="display: flex; align-items: center; gap: 0.5rem;">
+                <select name="cal_month" class="form-select" style="width: auto; padding: 0.4rem 0.85rem; border-radius: 8px; font-weight: 600;" onchange="this.form.submit()">
+                    @for($m = 1; $m <= 12; $m++)
+                        @php $mStr = sprintf('%02d', $m); @endphp
+                        <option value="{{ $mStr }}" {{ $mStr == $calMonth ? 'selected' : '' }}>
+                            {{ \Carbon\Carbon::create(null, $m, 1)->translatedFormat('F') }} {{ $calYear }}
+                        </option>
+                    @endfor
+                </select>
+            </form>
+        </div>
     </div>
 
     <!-- Grid Cards Kamar -->
@@ -223,9 +298,10 @@
                 <div style="border-top: 1px solid #f1f5f9; padding-top: 0.85rem; margin-top: 0.5rem;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 0.4rem;">
                         <span style="font-size: 0.75rem; font-weight: 700; color: #334155;">Kalender {{ $firstDay->translatedFormat('F Y') }}</span>
-                        <div style="display: flex; gap: 0.5rem; font-size: 0.68rem; font-weight: 600;">
+                        <div style="display: flex; gap: 0.4rem; font-size: 0.65rem; font-weight: 600; flex-wrap: wrap;">
                             <span style="color: #16a34a;">🟢 Bebas</span>
-                            <span style="color: #dc2626;">🔴 X Terbooking (Klik)</span>
+                            <span style="color: #7e22ce;">🟣 Weekend/Libur</span>
+                            <span style="color: #dc2626;">🔴 X Terbooking</span>
                         </div>
                     </div>
 
@@ -251,14 +327,22 @@
                                 $dStr = sprintf('%04d-%02d-%02d', $calYear, $calMonth, $d);
                                 $isBooked = isset($bookedMap[$dStr]);
                                 $bookInfo = $isBooked ? $bookedMap[$dStr] : null;
+
+                                $dtCarbon = \Carbon\Carbon::createFromDate((int)$calYear, (int)$calMonth, $d);
+                                $dayOfWeek = $dtCarbon->dayOfWeek; // 0 = Sun, 5 = Fri, 6 = Sat
+                                $isWeekendOrHoliday = in_array($dayOfWeek, [0, 5, 6]) || in_array($dStr, $holidayDates ?? []);
                             @endphp
 
                             @if($isBooked)
                                 <a href="{{ route('admin.bookings.index') }}?code={{ $bookInfo['code'] }}" class="calendar-day-cell day-booked" style="text-decoration: none;" title="Terbooking oleh: {{ $bookInfo['customer'] }} ({{ $bookInfo['code'] }}) - Klik untuk lihat detail pemesanan">
                                     {{ $d }}
                                 </a>
+                            @elseif($isWeekendOrHoliday)
+                                <div class="calendar-day-cell day-weekend" title="Rate Weekend / Tanggal Merah">
+                                    {{ $d }}
+                                </div>
                             @else
-                                <div class="calendar-day-cell day-available" title="Kamar Bebas">
+                                <div class="calendar-day-cell day-available" title="Kamar Bebas (Weekday)">
                                     {{ $d }}
                                 </div>
                             @endif
@@ -270,4 +354,97 @@
     </div>
 </div>
 
+<!-- Modal Kelola Tanggal Libur / Rate Weekend Khusus -->
+<div class="modal-backdrop" id="holidayModal">
+    <div class="modal-card" style="max-width: 620px;">
+        <div class="modal-header">
+            <div>
+                <h3 class="modal-title"><i class="fa-solid fa-calendar-star" style="color: #7e22ce;"></i> Kelola Tanggal Libur & Rate Weekend Khusus</h3>
+                <div style="font-size: 0.78rem; color: #64748b; margin-top: 0.2rem;">Tambah tanggal khusus agar otomatis memakai Harga Weekend & Libur (berwarna Ungu di kalender).</div>
+            </div>
+            <button type="button" class="btn-close-modal" onclick="closeHolidayModal()">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Form Tambah Tanggal Khusus -->
+        <form action="{{ route('admin.holidays.store') }}" method="POST" style="background: #f8fafc; padding: 1.1rem; border-radius: 14px; border: 1px solid #e2e8f0; margin-bottom: 1.25rem;">
+            @csrf
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.75rem; margin-bottom: 0.75rem;">
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="holiday_date" class="form-label">Tanggal Khusus / Libur <span style="color: #dc2626;">*</span></label>
+                    <input type="date" id="holiday_date" name="date" class="form-input" required>
+                </div>
+                <div class="form-group" style="margin-bottom: 0;">
+                    <label for="holiday_name" class="form-label">Keterangan Tanggal <span style="color: #dc2626;">*</span></label>
+                    <input type="text" id="holiday_name" name="name" class="form-input" placeholder="misal: Cuti Bersama / High Season" required>
+                </div>
+            </div>
+            <div style="text-align: right;">
+                <button type="submit" class="btn-submit" style="background-color: #7e22ce; width: auto; padding: 0.45rem 1rem; font-size: 0.8rem;">
+                    <i class="fa-solid fa-plus-circle"></i>
+                    <span>Tambah Tanggal</span>
+                </button>
+            </div>
+        </form>
+
+        <!-- Daftar Tanggal Merah / Khusus -->
+        <div>
+            <label class="form-label" style="margin-bottom: 0.5rem; display: flex; justify-content: space-between; align-items: center;">
+                <span>Daftar Tanggal Khusus Terdaftar</span>
+                <span style="font-weight: 400; font-size: 0.75rem; color: #64748b;">({{ count($allHolidays ?? []) }} Tanggal)</span>
+            </label>
+            <div style="max-height: 220px; overflow-y: auto; border: 1px solid #e2e8f0; border-radius: 12px;">
+                <table class="data-table" style="font-size: 0.8rem;">
+                    <thead>
+                        <tr>
+                            <th>Tanggal</th>
+                            <th>Keterangan</th>
+                            <th style="text-align: center; width: 60px;">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @forelse($allHolidays ?? [] as $h)
+                        <tr>
+                            <td style="font-weight: 700; color: #7e22ce;">{{ \Carbon\Carbon::parse($h->date)->format('d M Y') }} ({{ \Carbon\Carbon::parse($h->date)->translatedFormat('l') }})</td>
+                            <td>{{ $h->name }}</td>
+                            <td style="text-align: center;">
+                                <form action="{{ route('admin.holidays.destroy', $h->id) }}" method="POST" onsubmit="return confirm('Hapus tanggal libur ini?')">
+                                    @csrf
+                                    @method('DELETE')
+                                    <button type="submit" style="background: #fee2e2; color: #dc2626; border: none; padding: 0.25rem 0.5rem; border-radius: 6px; cursor: pointer;" title="Hapus">
+                                        <i class="fa-solid fa-trash"></i>
+                                    </button>
+                                </form>
+                            </td>
+                        </tr>
+                        @empty
+                        <tr>
+                            <td colspan="3" style="text-align: center; color: #94a3b8; font-style: italic;">Belum ada tanggal khusus terdaftar.</td>
+                        </tr>
+                        @endforelse
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div style="display: flex; justify-content: flex-end; margin-top: 1.25rem;">
+            <button type="button" class="btn-edit" style="background-color: #f1f5f9; color: #475569; width: auto; padding: 0.5rem 1.2rem;" onclick="closeHolidayModal()">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+@endsection
+
+@section('scripts')
+<script>
+    function openHolidayModal() {
+        document.getElementById('holidayModal').classList.add('show');
+    }
+    function closeHolidayModal() {
+        document.getElementById('holidayModal').classList.remove('show');
+    }
+</script>
 @endsection
