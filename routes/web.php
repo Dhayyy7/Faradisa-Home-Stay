@@ -28,6 +28,11 @@ Route::post('/login', [LoginController::class, 'login'])->name('login.post');
 Route::middleware(['auth'])->group(function () {
     Route::post('/logout', [LoginController::class, 'logout'])->name('logout');
 
+    // Analytics Dashboard Route (Accessible to All Auth Admin Users/Staff)
+    Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
+    Route::get('/admin/dashboard/report/pdf', [DashboardController::class, 'reportPdf'])->name('admin.dashboard.report.pdf');
+    Route::get('/admin/dashboard/report/excel', [DashboardController::class, 'reportExcel'])->name('admin.dashboard.report.excel');
+
     // Room Details Route (Accessible to All Auth Users/Staff)
     Route::get('/admin/rooms/details', [RoomController::class, 'details'])->name('admin.rooms.details');
 
@@ -42,13 +47,9 @@ Route::middleware(['auth'])->group(function () {
     Route::patch('/admin/bookings/{booking}/lunas', [BookingController::class, 'markAsLunas'])->name('admin.bookings.mark-lunas');
     Route::get('/admin/bookings/{booking}/receipt', [BookingController::class, 'receipt'])->name('admin.bookings.receipt');
     Route::delete('/admin/bookings/{booking}', [BookingController::class, 'destroy'])->name('admin.bookings.destroy');
-    
+
     // Super Admin Only Routes
     Route::middleware(['superadmin'])->group(function () {
-        // Analytics Dashboard Route (Super Admin Only)
-        Route::get('/admin/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
-        Route::get('/admin/dashboard/report/pdf', [DashboardController::class, 'reportPdf'])->name('admin.dashboard.report.pdf');
-        Route::get('/admin/dashboard/report/excel', [DashboardController::class, 'reportExcel'])->name('admin.dashboard.report.excel');
         // Room & Unit Management Routes
         Route::get('/admin/rooms', [RoomController::class, 'index'])->name('admin.rooms.index');
         Route::post('/admin/rooms', [RoomController::class, 'store'])->name('admin.rooms.store');

@@ -50,9 +50,7 @@ class LoginController extends Controller
             $request->session()->regenerate();
 
             $user = Auth::user();
-            $targetRoute = ($user->role_user === 'Super Admin')
-                ? route('admin.dashboard')
-                : route('admin.rooms.details');
+            $targetRoute = route('admin.dashboard');
 
             return redirect()->intended($targetRoute)
                 ->with('success', 'Selamat datang kembali, ' . $user->name . '!');

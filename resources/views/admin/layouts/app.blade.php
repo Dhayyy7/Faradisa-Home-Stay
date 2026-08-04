@@ -473,7 +473,6 @@
         </div>
 
         <ul class="sidebar-menu">
-            @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
             <div class="menu-category"> Utama </div>
             <li class="nav-item">
                 <a href="{{ route('admin.dashboard') }}" class="nav-link {{ request()->routeIs('admin.dashboard') ? 'active' : '' }}">
@@ -481,7 +480,6 @@
                     <span>Dashboard</span>
                 </a>
             </li>
-            @endif
 
             <div class="menu-category"> Pengelolaan </div>
             @if(Auth::check() && Auth::user()->role_user === 'Super Admin')
