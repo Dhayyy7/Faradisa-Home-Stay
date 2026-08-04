@@ -618,7 +618,7 @@
                         <div>
                             <div class="nusakos-info-label">Email</div>
                             <div class="nusakos-info-text">
-                                reservasi@faradisahomestay.com
+                               faradisahomestaybjb@gmail.com
                             </div>
                         </div>
                     </div>
