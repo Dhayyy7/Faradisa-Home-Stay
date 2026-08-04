@@ -33,7 +33,7 @@
         $imgs = [];
         foreach($rawImgs as $im) {
             if (!empty($im)) {
-                $imgs[] = '/' . ltrim($im, '/');
+                $imgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
             }
         }
         if (count($imgs) === 0) {
@@ -662,7 +662,7 @@
         <div>
             <!-- Gallery Main Carousel -->
             <div class="gallery-main-wrapper" id="carouselWrapper">
-                <img id="mainGalleryImg" src="{{ str_starts_with($imgs[0], 'http') ? $imgs[0] : '/' . $imgs[0] }}" alt="{{ $room->name }}" class="gallery-main-img">
+                <img id="mainGalleryImg" src="{{ $imgs[0] }}" alt="{{ $room->name }}" class="gallery-main-img">
                 
                 @if(count($imgs) > 1)
                 <button type="button" class="carousel-nav-btn prev-btn" onclick="prevGalleryImg()" title="Foto Sebelumnya">
@@ -682,9 +682,8 @@
             @if(count($imgs) > 1)
             <div class="gallery-thumbs" id="galleryThumbsContainer">
                 @foreach($imgs as $idx => $img)
-                    @php $imgSrc = str_starts_with($img, 'http') ? $img : '/' . $img; @endphp
                     <div class="thumb-item {{ $idx === 0 ? 'active' : '' }}" onclick="setGalleryIndex({{ $idx + 1 }})">
-                        <img src="{{ $imgSrc }}" alt="{{ $room->name }}">
+                        <img src="{{ $img }}" alt="{{ $room->name }}">
                     </div>
                 @endforeach
             </div>
@@ -1039,7 +1038,7 @@
         const roomName = '{{ e($room->name) }}';
         const roomCode = '{{ e($room->code) }}';
 
-        const roomImagesList = @json(array_map(fn($im) => str_starts_with($im, 'http') ? $im : '/' . $im, $imgs));
+        const roomImagesList = @json($imgs);
         let currentGalleryIndex = 1;
         let autoSlideTimer = null;
 
