@@ -139,8 +139,8 @@
                 <a href="#kamars" class="btn-hero-primary">
                     <span>PESAN KAMAR</span>
                 </a>
-                <a href="https://wa.me/{{ $waClean }}?text=Halo%20Admin%20{{ urlencode($setting->homestay_name ?? 'Faradisa HomeStay') }},%20saya%20ingin%20bertanya%20informasi%20ketersediaan." target="_blank" class="btn-hero-secondary">
-                    <span>TANYA ADMIN</span>
+                <a href="{{ route('check-room') }}" class="btn-hero-secondary">
+                    <span>CEK KETERSEDIAAN</span>
                 </a>
             </div>
         </div>
@@ -168,9 +168,9 @@
                             <span>Pesan Kamar</span>
                             <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
                         </a>
-                        <a href="https://wa.me/{{ $waClean }}?text=Halo%20Admin%20{{ urlencode($setting->homestay_name ?? 'Faradisa HomeStay') }},%20tanya%20informasi." target="_blank" class="btn-card-secondary">
-                            <i class="fa-brands fa-whatsapp"></i>
-                            <span>Tanya Admin</span>
+                        <a href="{{ route('check-room') }}" class="btn-card-secondary">
+                            <i class="fa-solid fa-calendar-days"></i>
+                            <span>Cek Ketersediaan</span>
                         </a>
                     </div>
                 </div>

@@ -28,7 +28,7 @@
                 <select id="edit_room_id" name="room_id" class="form-select" required>
                     <option value="">-- Pilih Kamar --</option>
                     @foreach($rooms as $r)
-                        <option value="{{ $r->id }}">{{ $r->code }} - {{ $r->name }} (Rp {{ number_format($r->price, 0, ',', '.') }}{{ $r->discount ? ' - Diskon ' . number_format($r->discount, 0) . '%' : '' }})</option>
+                        <option value="{{ $r->id }}">{{ $r->code }} - {{ $r->name }} (Weekday: Rp {{ number_format($r->final_price, 0, ',', '.') }}{{ $r->weekend_price && $r->weekend_price > 0 ? ' | Weekend: Rp ' . number_format($r->final_weekend_price, 0, ',', '.') : '' }})</option>
                     @endforeach
                 </select>
             </div>
