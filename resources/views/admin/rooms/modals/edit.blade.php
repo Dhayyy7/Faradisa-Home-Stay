@@ -22,9 +22,15 @@
                 <input type="text" id="edit_name" name="name" class="form-input" required>
             </div>
 
-            <div class="form-group">
-                <label for="edit_price" class="form-label">Harga (Rp)</label>
-                <input type="number" id="edit_price" name="price" class="form-input" min="0" required>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                <div class="form-group">
+                    <label for="edit_price" class="form-label">Harga Weekday (Senin-Kamis)</label>
+                    <input type="number" id="edit_price" name="price" class="form-input" min="0" required>
+                </div>
+                <div class="form-group">
+                    <label for="edit_weekend_price" class="form-label">Harga Weekend & Libur</label>
+                    <input type="number" id="edit_weekend_price" name="weekend_price" class="form-input" min="0" placeholder="Opsional">
+                </div>
             </div>
 
             <div class="form-group">

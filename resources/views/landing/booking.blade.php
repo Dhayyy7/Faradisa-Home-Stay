@@ -527,6 +527,13 @@
             cursor: not-allowed;
         }
 
+        .date-cell.weekend-holiday {
+            background: #f3e8ff;
+            color: #7e22ce;
+            border: 1px solid #c084fc;
+            font-weight: 800;
+        }
+
         .date-cell.available {
             color: var(--nusakos-text-dark);
         }
@@ -745,10 +752,27 @@
                 <!-- Booking Action Box -->
                 <div class="sidebar-booking-card">
                     <div class="rate-type-box">
+                        @if($room->weekend_price && $room->weekend_price > 0)
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem; text-align: center;">
+                            <div>
+                                <div class="rate-type-title">Weekday (Sen-Kam)</div>
+                                <div class="rate-type-price" style="font-size: 1rem;">
+                                    Rp {{ number_format($room->final_price, 0, ',', '.') }}
+                                </div>
+                            </div>
+                            <div style="border-left: 1px solid var(--nusakos-border); padding-left: 0.5rem;">
+                                <div class="rate-type-title">Weekend & Libur</div>
+                                <div class="rate-type-price" style="font-size: 1rem; color: #4338ca;">
+                                    Rp {{ number_format($room->final_weekend_price, 0, ',', '.') }}
+                                </div>
+                            </div>
+                        </div>
+                        @else
                         <div class="rate-type-title">Harian</div>
                         <div class="rate-type-price">
                             Rp {{ number_format($room->final_price, 0, ',', '.') }} <span style="font-size: 0.8rem; font-weight: 500;">/malam</span>
                         </div>
+                        @endif
                     </div>
 
                     <div class="check-time-box">
@@ -777,9 +801,10 @@
                     <i class="fa-regular fa-calendar" style="color: var(--nusakos-brown);"></i>
                     <span>Ketersediaan</span>
                 </div>
-                <div class="calendar-legend">
+                <div class="calendar-legend" style="gap: 0.65rem; flex-wrap: wrap;">
+                    <div><span class="legend-dot" style="background: #ffffff; border: 1px solid #d1d5db;"></span> Weekday</div>
+                    <div><span class="legend-dot" style="background: #f3e8ff; border: 1px solid #c084fc;"></span> Weekend/Libur</div>
                     <div><span class="legend-dot" style="background: #d8c4b0;"></span> Terisi</div>
-                    <div><span class="legend-dot" style="background: #ffffff; border: 1px solid #d1d5db;"></span> Tersedia</div>
                 </div>
 
                 @php
@@ -810,10 +835,20 @@
 
                     @for($day = 1; $day <= $daysInMonth; $day++)
                         @php
-                            $dateStr = $now->copy()->day($day)->format('Y-m-d');
+                            $dtCarbon = $now->copy()->day($day);
+                            $dateStr = $dtCarbon->format('Y-m-d');
                             $isBooked = in_array($dateStr, $bookedDates);
+                            $dayOfWeek = $dtCarbon->dayOfWeek; // 0 = Sun, 5 = Fri, 6 = Sat
+                            $isWeekendOrHoliday = in_array($dayOfWeek, [0, 5, 6]) || in_array($dateStr, $holidayDates ?? []);
+
+                            $cellClass = 'available';
+                            if ($isBooked) {
+                                $cellClass = 'booked';
+                            } elseif ($isWeekendOrHoliday) {
+                                $cellClass = 'weekend-holiday';
+                            }
                         @endphp
-                        <div class="date-cell {{ $isBooked ? 'booked' : 'available' }}">
+                        <div class="date-cell {{ $cellClass }}" title="{{ $isWeekendOrHoliday ? 'Rate Weekend / Tanggal Merah' : '' }}">
                             {{ $day }}
                         </div>
                     @endfor
@@ -996,6 +1031,10 @@
 
     <script>
         const roomPrice = {{ $room->final_price }};
+        const roomWeekdayPrice = {{ $room->price }};
+        const roomWeekendPrice = {{ $room->weekend_price && $room->weekend_price > 0 ? $room->weekend_price : $room->price }};
+        const roomDiscount = {{ $room->discount ?? 0 }};
+        const holidayDatesList = @json($holidayDates ?? []);
         const waPhone = '{{ $waClean }}';
         const roomName = '{{ e($room->name) }}';
         const roomCode = '{{ e($room->code) }}';
@@ -1113,12 +1152,37 @@
             const checkOutVal = document.getElementById('modal_check_out').value;
             if (!checkInVal || !checkOutVal) return;
 
-            const checkIn = new Date(checkInVal);
-            const checkOut = new Date(checkOutVal);
-            const diffTime = Math.abs(checkOut - checkIn);
-            const totalNights = Math.max(1, Math.ceil(diffTime / (1000 * 60 * 60 * 24)));
+            let checkIn = new Date(checkInVal + 'T00:00:00');
+            let checkOut = new Date(checkOutVal + 'T00:00:00');
+            if (checkOut <= checkIn) return;
 
-            const roomSubtotal = roomPrice * totalNights;
+            let weekdayNights = 0;
+            let weekendNights = 0;
+            let roomSubtotal = 0;
+
+            let curr = new Date(checkIn);
+            while (curr < checkOut) {
+                let dayOfWeek = curr.getDay(); // 0 = Sun, 5 = Fri, 6 = Sat
+                let yyyy = curr.getFullYear();
+                let mm = String(curr.getMonth() + 1).padStart(2, '0');
+                let dd = String(curr.getDate()).padStart(2, '0');
+                let dateStr = `${yyyy}-${mm}-${dd}`;
+
+                let isWeekendOrHoliday = (dayOfWeek === 0 || dayOfWeek === 5 || dayOfWeek === 6) || (Array.isArray(holidayDatesList) && holidayDatesList.includes(dateStr));
+                let baseRate = (isWeekendOrHoliday && roomWeekendPrice > 0) ? roomWeekendPrice : roomWeekdayPrice;
+                let finalRate = roomDiscount > 0 ? baseRate - (baseRate * (roomDiscount / 100)) : baseRate;
+
+                if (isWeekendOrHoliday) {
+                    weekendNights++;
+                } else {
+                    weekdayNights++;
+                }
+                roomSubtotal += finalRate;
+
+                curr.setDate(curr.getDate() + 1);
+            }
+
+            const totalNights = weekdayNights + weekendNights;
 
             let extraSubtotal = 0;
             document.querySelectorAll('.extra-facility-checkbox:checked').forEach(cb => {
@@ -1127,7 +1191,16 @@
 
             const grandTotal = roomSubtotal + extraSubtotal;
 
-            document.getElementById('modal_total_nights').innerText = `${totalNights} Malam`;
+            let nightsLabel = `${totalNights} Malam`;
+            if (weekdayNights > 0 && weekendNights > 0) {
+                nightsLabel += ` (${weekdayNights}x Weekday, ${weekendNights}x Weekend/Libur)`;
+            } else if (weekendNights > 0) {
+                nightsLabel += ` (${weekendNights}x Weekend/Libur)`;
+            } else {
+                nightsLabel += ` (${weekdayNights}x Weekday)`;
+            }
+
+            document.getElementById('modal_total_nights').innerText = nightsLabel;
             document.getElementById('modal_room_subtotal').innerText = `Rp ${new Intl.NumberFormat('id-ID').format(roomSubtotal)}`;
             document.getElementById('modal_extra_subtotal').innerText = `Rp ${new Intl.NumberFormat('id-ID').format(extraSubtotal)}`;
             document.getElementById('modal_grand_total').innerText = `Rp ${new Intl.NumberFormat('id-ID').format(grandTotal)}`;

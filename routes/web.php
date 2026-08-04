@@ -6,6 +6,7 @@ use App\Http\Controllers\Admin\BookingController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\FacilityController;
 use App\Http\Controllers\Admin\ExtraFacilityController;
+use App\Http\Controllers\Admin\HolidayController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\RoomController;
 use App\Http\Controllers\Admin\SettingController;
@@ -28,6 +29,10 @@ Route::middleware(['auth'])->group(function () {
 
     // Room Details Route (Accessible to All Auth Users/Staff)
     Route::get('/admin/rooms/details', [RoomController::class, 'details'])->name('admin.rooms.details');
+
+    // Custom Holiday Routes
+    Route::post('/admin/holidays', [HolidayController::class, 'store'])->name('admin.holidays.store');
+    Route::delete('/admin/holidays/{holiday}', [HolidayController::class, 'destroy'])->name('admin.holidays.destroy');
 
     // Booking Management Routes (Accessible to Auth Users/Staff)
     Route::get('/admin/bookings', [BookingController::class, 'index'])->name('admin.bookings.index');

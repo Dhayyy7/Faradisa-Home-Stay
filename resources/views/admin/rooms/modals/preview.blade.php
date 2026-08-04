@@ -18,18 +18,22 @@
             </div>
         </div>
 
-        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 1rem; background-color: #f8fafc; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem; border: 1px solid #e2e8f0;">
+        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 0.75rem; background-color: #f8fafc; padding: 1.1rem; border-radius: 12px; margin-bottom: 1.25rem; border: 1px solid #e2e8f0;">
             <div>
-                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Harga Normal</div>
-                <div style="font-size: 1.1rem; font-weight: 700; color: #0f172a; margin-top: 0.2rem;" id="preview_price">Rp 0</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Harga Weekday</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #0f172a; margin-top: 0.2rem;" id="preview_price">Rp 0</div>
             </div>
             <div>
-                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Diskon</div>
-                <div style="font-size: 1.1rem; font-weight: 700; color: #dc2626; margin-top: 0.2rem;" id="preview_discount">0%</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Harga Weekend</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #4338ca; margin-top: 0.2rem;" id="preview_weekend_price">Rp 0</div>
             </div>
             <div>
-                <div style="font-size: 0.75rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Harga Nett</div>
-                <div style="font-size: 1.1rem; font-weight: 700; color: #16a34a; margin-top: 0.2rem;" id="preview_final_price">Rp 0</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Diskon</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #dc2626; margin-top: 0.2rem;" id="preview_discount">0%</div>
+            </div>
+            <div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">Nett Weekday</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #16a34a; margin-top: 0.2rem;" id="preview_final_price">Rp 0</div>
             </div>
         </div>
 

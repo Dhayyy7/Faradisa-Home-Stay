@@ -7,13 +7,14 @@
         document.getElementById('createRoomModal').classList.remove('show');
     }
 
-    function openEditModal(id, code, name, price, discount, description, selectedFacilityIds, roomImages) {
+    function openEditModal(id, code, name, price, weekendPrice, discount, description, selectedFacilityIds, roomImages) {
         const form = document.getElementById('editForm');
         form.action = `/admin/rooms/${id}`;
 
         document.getElementById('edit_code').value = code;
         document.getElementById('edit_name').value = name;
         document.getElementById('edit_price').value = price;
+        document.getElementById('edit_weekend_price').value = weekendPrice > 0 ? weekendPrice : '';
         document.getElementById('edit_discount').value = discount > 0 ? discount : '';
         document.getElementById('edit_description').value = description || '';
 
@@ -114,6 +115,7 @@
         document.getElementById('preview_code').innerText = room.code;
         document.getElementById('preview_name').innerText = room.name;
         document.getElementById('preview_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(room.price);
+        document.getElementById('preview_weekend_price').innerText = room.weekend_price && room.weekend_price > 0 ? 'Rp ' + new Intl.NumberFormat('id-ID').format(room.weekend_price) : 'Sama';
         document.getElementById('preview_discount').innerText = room.discount && room.discount > 0 ? room.discount + '%' : 'Tidak Ada';
         document.getElementById('preview_final_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(finalPrice);
 

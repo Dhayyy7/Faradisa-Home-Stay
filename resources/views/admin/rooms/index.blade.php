@@ -307,7 +307,7 @@
                     <th>Foto</th>
                     <th>Kode & Nama Kamar</th>
                     <th>Keterangan</th>
-                    <th>Harga Normal</th>
+                    <th>Harga (Weekday / Weekend)</th>
                     <th>Diskon</th>
                     <th>Fasilitas</th>
                     <th style="text-align: center;">Aksi</th>
@@ -345,9 +345,16 @@
                         @endif
                     </td>
                     <td>
-                        <div style="font-weight: 700; color: #0f172a;">Rp {{ number_format($room->price, 0, ',', '.') }}</div>
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #0f172a;">
+                            <span style="font-size: 0.72rem; color: #64748b; font-weight: 500;">Weekday:</span> Rp {{ number_format($room->price, 0, ',', '.') }}
+                        </div>
+                        @if($room->weekend_price && $room->weekend_price > 0)
+                        <div style="font-size: 0.82rem; font-weight: 700; color: #4338ca; margin-top: 0.15rem;">
+                            <span style="font-size: 0.72rem; color: #6366f1; font-weight: 500;">Weekend:</span> Rp {{ number_format($room->weekend_price, 0, ',', '.') }}
+                        </div>
+                        @endif
                         @if($room->discount && $room->discount > 0)
-                        <div style="font-size: 0.78rem; color: #16a34a; font-weight: 600;">
+                        <div style="font-size: 0.75rem; color: #16a34a; font-weight: 600; margin-top: 0.15rem;">
                             Nett: Rp {{ number_format($room->final_price, 0, ',', '.') }}
                         </div>
                         @endif
@@ -376,7 +383,7 @@
                                 <span>Preview</span>
                             </button>
 
-                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->discount ?? 0 }}, '{{ addslashes(str_replace(array("\r", "\n"), array('\r', '\n'), $room->description ?? '')) }}', {{ json_encode($room->facilities->pluck('id')->toArray()) }}, {{ json_encode($room->images ?? []) }})">
+                            <button type="button" class="btn-edit" onclick="openEditModal({{ $room->id }}, '{{ addslashes($room->code) }}', '{{ addslashes($room->name) }}', {{ $room->price }}, {{ $room->weekend_price ?? 0 }}, {{ $room->discount ?? 0 }}, '{{ addslashes(str_replace(array("\r", "\n"), array('\r', '\n'), $room->description ?? '')) }}', {{ json_encode($room->facilities->pluck('id')->toArray()) }}, {{ json_encode($room->images ?? []) }})">
                                 <i class="fa-solid fa-pen-to-square"></i>
                                 <span>Edit</span>
                             </button>
