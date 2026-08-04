@@ -55,7 +55,7 @@
             </div>
 
             <div class="form-group">
-                <label for="images" class="form-label">Foto Kamar <span style="font-weight: 400; color: #64748b;">(Maksimal 5 Foto)</span></label>
+                <label for="images" class="form-label">Foto Kamar <span style="font-weight: 400; color: #64748b;">(Maksimal 10 Foto)</span></label>
                 <input type="file" id="images" name="images[]" class="form-input" multiple accept="image/*">
             </div>
 
