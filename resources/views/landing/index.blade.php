@@ -288,11 +288,12 @@
                             <!-- Room Image Header -->
                             <div class="room-img-container">
                                 @php
-                                    $imgs = is_array($room->images) ? $room->images : [];
-                                    $thumb = count($imgs) > 0 ? end($imgs) : null;
+                                    $imgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
+                                    $rawThumb = count($imgs) > 0 ? end($imgs) : null;
+                                    $thumb = $rawThumb ? ('/' . ltrim($rawThumb, '/')) : null;
                                 @endphp
-                                @if($thumb && file_exists(public_path($thumb)))
-                                    <img src="/{{ $thumb }}" alt="{{ $room->name }}" class="room-img">
+                                @if($thumb)
+                                    <img src="{{ $thumb }}" alt="{{ $room->name }}" class="room-img">
                                 @else
                                     <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 3rem;">
                                         <i class="fa-solid fa-bed"></i>

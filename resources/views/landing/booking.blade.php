@@ -32,8 +32,8 @@
         $rawImgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
         $imgs = [];
         foreach($rawImgs as $im) {
-            if(file_exists(public_path($im))) {
-                $imgs[] = $im;
+            if (!empty($im)) {
+                $imgs[] = '/' . ltrim($im, '/');
             }
         }
         if (count($imgs) === 0) {

@@ -403,7 +403,8 @@
                     }
 
                     $imgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
-                    $thumb = count($imgs) > 0 ? end($imgs) : null;
+                    $rawThumb = count($imgs) > 0 ? end($imgs) : null;
+                    $thumb = $rawThumb ? ('/' . ltrim($rawThumb, '/')) : null;
                 @endphp
 
                 <div class="room-detail-card">
@@ -428,8 +429,8 @@
                         <!-- Image & Facilities Overview -->
                         <div style="display: flex; gap: 0.85rem; margin-bottom: 1rem; align-items: center;">
                             <div style="width: 75px; height: 65px; border-radius: 12px; overflow: hidden; background-color: #f1f5f9; flex-shrink: 0;">
-                                @if($thumb && file_exists(public_path($thumb)))
-                                    <img src="/{{ $thumb }}" alt="{{ $room->name }}" style="width: 100%; height: 100%; object-fit: cover;">
+                                @if($thumb)
+                                    <img src="{{ $thumb }}" alt="{{ $room->name }}" style="width: 100%; height: 100%; object-fit: cover;">
                                 @else
                                     <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #cbd5e1;">
                                         <i class="fa-solid fa-bed" style="font-size: 1.35rem;"></i>
