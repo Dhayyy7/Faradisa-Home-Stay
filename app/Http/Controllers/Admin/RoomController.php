@@ -53,7 +53,7 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
-            'images' => ['nullable', 'array', 'max:5'],
+            'images' => ['nullable', 'array', 'max:10'],
             'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
         ], [
             'code.required' => 'Kode Kamar wajib diisi.',
@@ -61,7 +61,7 @@ class RoomController extends Controller
             'name.required' => 'Nama Kamar / Unit wajib diisi.',
             'price.required' => 'Harga kamar wajib diisi.',
             'discount.max' => 'Diskon maksimal 100%.',
-            'images.max' => 'Maksimal 5 foto kamar yang dapat diunggah.',
+            'images.max' => 'Maksimal 10 foto kamar yang dapat diunggah.',
         ]);
 
         $imagePaths = [];
@@ -109,7 +109,7 @@ class RoomController extends Controller
             'description' => ['nullable', 'string'],
             'facilities' => ['nullable', 'array'],
             'facilities.*' => ['exists:facilities,id'],
-            'images' => ['nullable', 'array', 'max:5'],
+            'images' => ['nullable', 'array', 'max:10'],
             'images.*' => ['image', 'mimes:jpeg,png,jpg,webp', 'max:2048'],
             'deleted_images' => ['nullable', 'array'],
         ], [
@@ -118,7 +118,7 @@ class RoomController extends Controller
             'name.required' => 'Nama Kamar / Unit wajib diisi.',
             'price.required' => 'Harga kamar wajib diisi.',
             'discount.max' => 'Diskon maksimal 100%.',
-            'images.max' => 'Maksimal 5 foto kamar yang dapat diunggah.',
+            'images.max' => 'Maksimal 10 foto kamar yang dapat diunggah.',
         ]);
 
         $imagePaths = is_array($room->images) ? array_values($room->images) : [];
