@@ -33,7 +33,14 @@
         $imgs = [];
         foreach($rawImgs as $im) {
             if (!empty($im)) {
-                $imgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
+                if (str_starts_with($im, 'http')) {
+                    $imgs[] = $im;
+                } else {
+                    $cleanPath = ltrim($im, '/');
+                    if (file_exists(public_path($cleanPath))) {
+                        $imgs[] = '/' . $cleanPath;
+                    }
+                }
             }
         }
         if (count($imgs) === 0) {
@@ -662,7 +669,7 @@
         <div>
             <!-- Gallery Main Carousel -->
             <div class="gallery-main-wrapper" id="carouselWrapper">
-                <img id="mainGalleryImg" src="{{ $imgs[0] }}" alt="{{ $room->name }}" class="gallery-main-img">
+                <img id="mainGalleryImg" src="{{ $imgs[0] }}" alt="{{ $room->name }}" class="gallery-main-img" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80';">
                 
                 @if(count($imgs) > 1)
                 <button type="button" class="carousel-nav-btn prev-btn" onclick="prevGalleryImg()" title="Foto Sebelumnya">
@@ -683,7 +690,7 @@
             <div class="gallery-thumbs" id="galleryThumbsContainer">
                 @foreach($imgs as $idx => $img)
                     <div class="thumb-item {{ $idx === 0 ? 'active' : '' }}" onclick="setGalleryIndex({{ $idx + 1 }})">
-                        <img src="{{ $img }}" alt="{{ $room->name }}">
+                        <img src="{{ $img }}" alt="{{ $room->name }}" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80';">
                     </div>
                 @endforeach
             </div>

@@ -319,11 +319,29 @@
                     <td>{{ $index + 1 }}</td>
                     <td>
                         @php
-                            $roomImages = is_array($room->images) ? $room->images : [];
-                            $lastImage = count($roomImages) > 0 ? end($roomImages) : null;
+                            $roomImages = is_array($room->images) ? array_values(array_filter($room->images)) : [];
+                            $validImage = null;
+                            foreach ($roomImages as $im) {
+                                if (!empty($im)) {
+                                    if (str_starts_with($im, 'http')) {
+                                        $validImage = $im;
+                                        break;
+                                    } else {
+                                        $cleanPath = ltrim($im, '/');
+                                        if (file_exists(public_path($cleanPath))) {
+                                            $validImage = '/' . $cleanPath;
+                                            break;
+                                        }
+                                    }
+                                }
+                            }
                         @endphp
-                        @if($lastImage)
-                            <img src="/{{ $lastImage }}" alt="{{ $room->name }}" style="width: 55px; height: 55px; object-fit: cover; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);">
+                        @if($validImage)
+                            <img src="{{ $validImage }}" alt="{{ $room->name }}" style="width: 55px; height: 55px; object-fit: cover; border-radius: 10px; border: 1px solid #e2e8f0; box-shadow: 0 2px 4px rgba(0,0,0,0.05);" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                            <div style="display: none; width: 55px; height: 55px; border-radius: 10px; background-color: #f1f5f9; border: 1px dashed #cbd5e1; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.68rem; text-align: center; flex-direction: column;">
+                                <i class="fa-solid fa-image" style="font-size: 0.9rem; margin-bottom: 0.15rem; color: #cbd5e1;"></i>
+                                No Image
+                            </div>
                         @else
                             <div style="width: 55px; height: 55px; border-radius: 10px; background-color: #f1f5f9; border: 1px dashed #cbd5e1; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.68rem; text-align: center;">
                                 <i class="fa-solid fa-image" style="font-size: 0.9rem; margin-bottom: 0.15rem; color: #cbd5e1;"></i>

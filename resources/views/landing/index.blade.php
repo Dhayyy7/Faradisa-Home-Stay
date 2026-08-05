@@ -289,13 +289,28 @@
                             <div class="room-img-container">
                                 @php
                                     $imgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
-                                    $rawThumb = count($imgs) > 0 ? end($imgs) : null;
-                                    $thumb = $rawThumb ? ('/' . ltrim($rawThumb, '/')) : null;
+                                    $validImgs = [];
+                                    foreach ($imgs as $im) {
+                                        if (!empty($im)) {
+                                            if (str_starts_with($im, 'http')) {
+                                                $validImgs[] = $im;
+                                            } else {
+                                                $cleanPath = ltrim($im, '/');
+                                                if (file_exists(public_path($cleanPath))) {
+                                                    $validImgs[] = '/' . $cleanPath;
+                                                }
+                                            }
+                                        }
+                                    }
+                                    $thumb = count($validImgs) > 0 ? end($validImgs) : null;
                                 @endphp
                                 @if($thumb)
-                                    <img src="{{ $thumb }}" alt="{{ $room->name }}" class="room-img">
+                                    <img src="{{ $thumb }}" alt="{{ $room->name }}" class="room-img" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                                    <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; color: #94a3b8; font-size: 3rem; background-color: #f1f5f9;">
+                                        <i class="fa-solid fa-bed"></i>
+                                    </div>
                                 @else
-                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 3rem;">
+                                    <div style="width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: #94a3b8; font-size: 3rem; background-color: #f1f5f9;">
                                         <i class="fa-solid fa-bed"></i>
                                     </div>
                                 @endif

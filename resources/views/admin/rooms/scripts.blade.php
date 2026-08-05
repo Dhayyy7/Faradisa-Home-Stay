@@ -50,7 +50,7 @@
                 wrapper.style.height = '85px';
 
                 wrapper.innerHTML = `
-                    <img src="/${imgPath}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;">
+                    <img src="/${imgPath}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.style.background='#f1f5f9'; this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.75rem;padding:4px;text-align:center;\\'>Gambar tidak ditemukan</div>';">
                     <button type="button" onclick="markImageForDeletion('${imgPath}', this)" 
                             style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); transition: transform 0.15s ease;"
                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"

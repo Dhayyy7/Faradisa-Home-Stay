@@ -67,13 +67,21 @@ class RoomController extends Controller
         $imagePaths = [];
         if ($request->hasFile('images')) {
             $uploadPath = public_path('uploads/rooms');
+            $rootUploadPath = base_path('uploads/rooms');
+
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($uploadPath !== $rootUploadPath && !File::exists($rootUploadPath)) {
+                File::makeDirectory($rootUploadPath, 0755, true);
             }
 
             foreach ($request->file('images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move($uploadPath, $filename);
+                if ($uploadPath !== $rootUploadPath && File::exists($uploadPath . '/' . $filename)) {
+                    File::copy($uploadPath . '/' . $filename, $rootUploadPath . '/' . $filename);
+                }
                 $imagePaths[] = 'uploads/rooms/' . $filename;
             }
         }
@@ -131,6 +139,10 @@ class RoomController extends Controller
                 if (File::exists($fullPath)) {
                     File::delete($fullPath);
                 }
+                $rootDelPath = base_path($delPath);
+                if ($fullPath !== $rootDelPath && File::exists($rootDelPath)) {
+                    File::delete($rootDelPath);
+                }
                 $imagePaths = array_values(array_filter($imagePaths, fn($p) => $p !== $delPath));
             }
         }
@@ -138,13 +150,21 @@ class RoomController extends Controller
         // Process newly uploaded images
         if ($request->hasFile('images')) {
             $uploadPath = public_path('uploads/rooms');
+            $rootUploadPath = base_path('uploads/rooms');
+
             if (!File::exists($uploadPath)) {
                 File::makeDirectory($uploadPath, 0755, true);
+            }
+            if ($uploadPath !== $rootUploadPath && !File::exists($rootUploadPath)) {
+                File::makeDirectory($rootUploadPath, 0755, true);
             }
 
             foreach ($request->file('images') as $file) {
                 $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
                 $file->move($uploadPath, $filename);
+                if ($uploadPath !== $rootUploadPath && File::exists($uploadPath . '/' . $filename)) {
+                    File::copy($uploadPath . '/' . $filename, $rootUploadPath . '/' . $filename);
+                }
                 $imagePaths[] = 'uploads/rooms/' . $filename;
             }
         }
