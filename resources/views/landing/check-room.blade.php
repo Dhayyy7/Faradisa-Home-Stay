@@ -406,14 +406,7 @@
                     $validImgs = [];
                     foreach ($imgs as $im) {
                         if (!empty($im)) {
-                            if (str_starts_with($im, 'http')) {
-                                $validImgs[] = $im;
-                            } else {
-                                $cleanPath = ltrim($im, '/');
-                                if (file_exists(public_path($cleanPath))) {
-                                    $validImgs[] = '/' . $cleanPath;
-                                }
-                            }
+                            $validImgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
                         }
                     }
                     $thumb = count($validImgs) > 0 ? end($validImgs) : null;

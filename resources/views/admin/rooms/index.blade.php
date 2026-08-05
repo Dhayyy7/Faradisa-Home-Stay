@@ -321,19 +321,9 @@
                         @php
                             $roomImages = is_array($room->images) ? array_values(array_filter($room->images)) : [];
                             $validImage = null;
-                            foreach ($roomImages as $im) {
-                                if (!empty($im)) {
-                                    if (str_starts_with($im, 'http')) {
-                                        $validImage = $im;
-                                        break;
-                                    } else {
-                                        $cleanPath = ltrim($im, '/');
-                                        if (file_exists(public_path($cleanPath))) {
-                                            $validImage = '/' . $cleanPath;
-                                            break;
-                                        }
-                                    }
-                                }
+                            if (count($roomImages) > 0) {
+                                $lastIm = end($roomImages);
+                                $validImage = str_starts_with($lastIm, 'http') ? $lastIm : ('/' . ltrim($lastIm, '/'));
                             }
                         @endphp
                         @if($validImage)

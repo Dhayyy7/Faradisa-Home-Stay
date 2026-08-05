@@ -33,14 +33,7 @@
         $imgs = [];
         foreach($rawImgs as $im) {
             if (!empty($im)) {
-                if (str_starts_with($im, 'http')) {
-                    $imgs[] = $im;
-                } else {
-                    $cleanPath = ltrim($im, '/');
-                    if (file_exists(public_path($cleanPath))) {
-                        $imgs[] = '/' . $cleanPath;
-                    }
-                }
+                $imgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
             }
         }
         if (count($imgs) === 0) {
