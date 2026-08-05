@@ -50,9 +50,15 @@
                 wrapper.style.height = '85px';
 
                 wrapper.innerHTML = `
-                    <img src="/${imgPath}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.onerror=null; this.parentElement.style.background='#f1f5f9'; this.parentElement.innerHTML='<div style=\\'width:100%;height:100%;display:flex;align-items:center;justify-content:center;color:#94a3b8;font-size:0.75rem;padding:4px;text-align:center;\\'>Gambar tidak ditemukan</div>';">
+                    <div style="width: 100%; height: 100%; position: relative;">
+                        <img src="/${imgPath}" alt="Foto ${index + 1}" style="width: 100%; height: 100%; object-fit: cover;" onerror="this.style.display='none'; if(this.nextElementSibling) this.nextElementSibling.style.display='flex';">
+                        <div style="display: none; width: 100%; height: 100%; align-items: center; justify-content: center; color: #94a3b8; font-size: 0.72rem; text-align: center; padding: 4px; background: #f1f5f9; flex-direction: column;">
+                            <i class="fa-solid fa-image-slash" style="font-size: 1rem; margin-bottom: 0.2rem; color: #cbd5e1;"></i>
+                            File Rusak
+                        </div>
+                    </div>
                     <button type="button" onclick="markImageForDeletion('${imgPath}', this)" 
-                            style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); transition: transform 0.15s ease;"
+                            style="position: absolute; top: 4px; right: 4px; width: 24px; height: 24px; border-radius: 50%; background: #ef4444; color: white; border: none; font-size: 0.75rem; cursor: pointer; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 6px rgba(0,0,0,0.35); z-index: 10; transition: transform 0.15s ease;"
                             onmouseover="this.style.transform='scale(1.1)'" onmouseout="this.style.transform='scale(1)'"
                             title="Hapus Foto Ini">
                         <i class="fa-solid fa-trash"></i>
