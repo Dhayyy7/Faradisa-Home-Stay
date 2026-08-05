@@ -253,21 +253,54 @@
             </thead>
             <tbody>
                 @php
-                    $discountMultiplier = 1 - (($booking->discount ?? 0) / 100);
-                    $pricePerNight = $booking->room_price * $discountMultiplier;
-                    $roomSubtotal = $pricePerNight * $booking->total_nights;
+                    $details = $booking->room ? $booking->room->calculateBookingDetails($booking->check_in_date, $booking->check_out_date) : null;
+                    $weekdayNights = $details['weekday_nights'] ?? $booking->total_nights;
+                    $weekendNights = $details['weekend_nights'] ?? 0;
+
+                    $effectiveDiscount = ($booking->admin_discount && $booking->admin_discount > 0) ? $booking->admin_discount : ($booking->discount ?? 0);
+                    $multiplier = 1 - ($effectiveDiscount / 100);
+
+                    $baseWeekday = $booking->room ? $booking->room->price : $booking->room_price;
+                    $baseWeekend = ($booking->room && $booking->room->weekend_price > 0) ? $booking->room->weekend_price : $baseWeekday;
+
+                    $netWeekdayUnit = $baseWeekday * $multiplier;
+                    $netWeekendUnit = $baseWeekend * $multiplier;
+
+                    $weekdaySubtotal = $netWeekdayUnit * $weekdayNights;
+                    $weekendSubtotal = $netWeekendUnit * $weekendNights;
                 @endphp
+
+                @if($weekdayNights > 0)
                 <tr>
                     <td>
-                        <strong>Sewa {{ $booking->room->name ?? 'Kamar' }}</strong>
-                        @if($booking->discount && $booking->discount > 0)
+                        <strong>Sewa {{ $booking->room->name ?? 'Kamar' }} (Hari Biasa / Weekday)</strong>
+                        @if($booking->admin_discount && $booking->admin_discount > 0)
+                            <div style="font-size: 10px; color: #ea580c; font-weight: bold;">Diskon Khusus Admin {{ number_format($booking->admin_discount, 0) }}% OFF</div>
+                        @elseif($booking->discount && $booking->discount > 0)
                             <div style="font-size: 10px; color: #dc2626;">Diskon {{ number_format($booking->discount, 0) }}% OFF</div>
                         @endif
                     </td>
-                    <td style="text-align: center;">{{ $booking->total_nights }} Malam</td>
-                    <td style="text-align: right;">Rp {{ number_format($pricePerNight, 0, ',', '.') }}</td>
-                    <td style="text-align: right; font-weight: bold;">Rp {{ number_format($roomSubtotal, 0, ',', '.') }}</td>
+                    <td style="text-align: center;">{{ $weekdayNights }} Malam</td>
+                    <td style="text-align: right;">Rp {{ number_format($netWeekdayUnit, 0, ',', '.') }}</td>
+                    <td style="text-align: right; font-weight: bold;">Rp {{ number_format($weekdaySubtotal, 0, ',', '.') }}</td>
                 </tr>
+                @endif
+
+                @if($weekendNights > 0)
+                <tr>
+                    <td>
+                        <strong>Sewa {{ $booking->room->name ?? 'Kamar' }} (Akhir Pekan / Weekend)</strong>
+                        @if($booking->admin_discount && $booking->admin_discount > 0)
+                            <div style="font-size: 10px; color: #ea580c; font-weight: bold;">Diskon Khusus Admin {{ number_format($booking->admin_discount, 0) }}% OFF</div>
+                        @elseif($booking->discount && $booking->discount > 0)
+                            <div style="font-size: 10px; color: #dc2626;">Diskon {{ number_format($booking->discount, 0) }}% OFF</div>
+                        @endif
+                    </td>
+                    <td style="text-align: center;">{{ $weekendNights }} Malam</td>
+                    <td style="text-align: right;">Rp {{ number_format($netWeekendUnit, 0, ',', '.') }}</td>
+                    <td style="text-align: right; font-weight: bold;">Rp {{ number_format($weekendSubtotal, 0, ',', '.') }}</td>
+                </tr>
+                @endif
 
                 @if(is_array($booking->extra_facilities) && count($booking->extra_facilities) > 0)
                     @foreach($booking->extra_facilities as $ef)

@@ -19,6 +19,7 @@ use Illuminate\Database\Eloquent\Attributes\Fillable;
     'total_nights',
     'room_price',
     'discount',
+    'admin_discount',
     'total_price',
     'status',
     'expired_at',
@@ -40,6 +41,7 @@ class Booking extends Model
             'check_out_date' => 'date',
             'expired_at' => 'datetime',
             'status' => 'integer',
+            'admin_discount' => 'float',
             'extra_facilities' => 'array',
         ];
     }

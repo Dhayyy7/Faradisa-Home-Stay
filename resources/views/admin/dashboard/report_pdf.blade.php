@@ -235,7 +235,12 @@
                     <td>{{ $b->check_in_date ? $b->check_in_date->format('d/m/Y') : '-' }}</td>
                     <td>{{ $b->check_out_date ? $b->check_out_date->format('d/m/Y') : '-' }}</td>
                     <td style="text-align: center;">{{ $b->total_nights }} Malam</td>
-                    <td style="font-weight: bold; color: #0f172a;">Rp {{ number_format($b->total_price, 0, ',', '.') }}</td>
+                    <td style="font-weight: bold; color: #0f172a;">
+                        Rp {{ number_format($b->total_price, 0, ',', '.') }}
+                        @if($b->admin_discount && $b->admin_discount > 0)
+                            <div style="font-size: 8px; color: #ea580c; font-weight: normal;">Diskon Admin {{ number_format($b->admin_discount, 0) }}%</div>
+                        @endif
+                    </td>
                     <td style="text-align: center;">
                         @if(in_array($b->status, [2, 3]))
                             <span class="status-badge status-lunas">LUNAS</span>

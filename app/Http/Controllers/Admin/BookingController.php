@@ -87,6 +87,7 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
+            'admin_discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'status' => ['nullable', 'integer', 'in:0,1,2,3,4'],
             'extra_facility_ids' => ['nullable', 'array'],
             'extra_facility_ids.*' => ['exists:extra_facilities,id'],
@@ -98,6 +99,9 @@ class BookingController extends Controller
             'check_in_date.required' => 'Tanggal Check-in wajib diisi.',
             'check_out_date.required' => 'Tanggal Check-out wajib diisi.',
             'check_out_date.after' => 'Tanggal Check-out harus setelah Tanggal Check-in.',
+            'admin_discount.numeric' => 'Diskon Admin harus berupa angka persentase (0 - 100).',
+            'admin_discount.min' => 'Diskon Admin minimal 0%.',
+            'admin_discount.max' => 'Diskon Admin maksimal 100%.',
         ]);
 
         $roomId = $request->input('room_id');
@@ -126,10 +130,18 @@ class BookingController extends Controller
         $checkIn = Carbon::parse($checkInStr);
         $checkOut = Carbon::parse($checkOutStr);
 
+        $adminDiscount = max(0, min(100, (float) $request->input('admin_discount', 0)));
+
         // Calculate dynamic room total price based on Weekday vs Weekend/Holiday nights
         $bookingDetails = $room->calculateBookingDetails($checkInStr, $checkOutStr);
         $totalNights = $bookingDetails['total_nights'];
-        $roomTotalPrice = $bookingDetails['total_final_price'];
+        
+        $roomOriginalPrice = $bookingDetails['total_original_price'];
+        if ($adminDiscount > 0) {
+            $roomTotalPrice = $roomOriginalPrice - ($roomOriginalPrice * ($adminDiscount / 100));
+        } else {
+            $roomTotalPrice = $bookingDetails['total_final_price'];
+        }
 
         // Code format: Kode Kamar + Tanggal Check-in YYYYMMDD (e.g. P1V120260729)
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
@@ -175,6 +187,7 @@ class BookingController extends Controller
             'total_nights' => $totalNights,
             'room_price' => $roomPrice,
             'discount' => $discount,
+            'admin_discount' => $adminDiscount,
             'total_price' => $totalPrice,
             'status' => $status,
             'expired_at' => $expiredAt,
@@ -199,6 +212,7 @@ class BookingController extends Controller
             'customer_sosmed' => ['nullable', 'string', 'max:255'],
             'check_in_date' => ['required', 'date'],
             'check_out_date' => ['required', 'date', 'after:check_in_date'],
+            'admin_discount' => ['nullable', 'numeric', 'min:0', 'max:100'],
             'status' => ['required', 'integer', 'in:0,1,2,3,4'],
             'extra_facility_ids' => ['nullable', 'array'],
             'extra_facility_ids.*' => ['exists:extra_facilities,id'],
@@ -210,6 +224,9 @@ class BookingController extends Controller
             'check_in_date.required' => 'Tanggal Check-in wajib diisi.',
             'check_out_date.required' => 'Tanggal Check-out wajib diisi.',
             'check_out_date.after' => 'Tanggal Check-out harus setelah Tanggal Check-in.',
+            'admin_discount.numeric' => 'Diskon Admin harus berupa angka persentase (0 - 100).',
+            'admin_discount.min' => 'Diskon Admin minimal 0%.',
+            'admin_discount.max' => 'Diskon Admin maksimal 100%.',
         ]);
 
         $roomId = $request->input('room_id');
@@ -243,10 +260,18 @@ class BookingController extends Controller
         $checkIn = Carbon::parse($checkInStr);
         $checkOut = Carbon::parse($checkOutStr);
 
+        $adminDiscount = max(0, min(100, (float) $request->input('admin_discount', 0)));
+
         // Calculate dynamic room total price based on Weekday vs Weekend/Holiday nights
         $bookingDetails = $room->calculateBookingDetails($checkInStr, $checkOutStr);
         $totalNights = $bookingDetails['total_nights'];
-        $roomTotalPrice = $bookingDetails['total_final_price'];
+
+        $roomOriginalPrice = $bookingDetails['total_original_price'];
+        if ($adminDiscount > 0) {
+            $roomTotalPrice = $roomOriginalPrice - ($roomOriginalPrice * ($adminDiscount / 100));
+        } else {
+            $roomTotalPrice = $bookingDetails['total_final_price'];
+        }
 
         // Recalculate code if room or checkin date changed
         $baseCode = strtoupper($room->code) . $checkIn->format('Ymd');
@@ -300,6 +325,7 @@ class BookingController extends Controller
             'total_nights' => $totalNights,
             'room_price' => $roomPrice,
             'discount' => $discount,
+            'admin_discount' => $adminDiscount,
             'total_price' => $totalPrice,
             'status' => $newStatus,
             'expired_at' => $expiredAt,

@@ -55,6 +55,11 @@
             </div>
 
             <div class="form-group">
+                <label for="admin_discount" class="form-label">Diskon Admin (%) <span style="font-weight: 400; color: #64748b;">(Khusus Potongan Kamar / Opsional)</span></label>
+                <input type="number" id="admin_discount" name="admin_discount" class="form-input" placeholder="Misal: 10 (artinya diskon 10% untuk kamar)" min="0" max="100" step="0.1" value="{{ old('admin_discount', 0) }}">
+            </div>
+
+            <div class="form-group">
                 <label class="form-label">Extra Fasilitas <span style="font-weight: 400; color: #64748b;">(Pilih Banyak / Opsional)</span></label>
                 <div class="facility-checkbox-grid">
                     @foreach($extraFacilities as $ef)

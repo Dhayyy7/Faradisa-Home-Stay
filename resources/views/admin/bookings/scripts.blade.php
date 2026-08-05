@@ -17,6 +17,7 @@
         document.getElementById('edit_customer_phone').value = booking.customer_phone;
         document.getElementById('edit_customer_sosmed').value = booking.customer_sosmed ?? '';
         document.getElementById('edit_customer_address').value = booking.customer_address;
+        document.getElementById('edit_admin_discount').value = booking.admin_discount ?? 0;
         
         // Format dates YYYY-MM-DD
         const checkIn = booking.check_in_date.split('T')[0];
@@ -77,8 +78,10 @@
         const extraContainer = document.getElementById('preview_extra_facilities_container');
         extraContainer.innerHTML = '';
 
+        let extraSubtotal = 0;
         if (booking.extra_facilities && Array.isArray(booking.extra_facilities) && booking.extra_facilities.length > 0) {
             booking.extra_facilities.forEach(ef => {
+                extraSubtotal += parseFloat(ef.price || 0);
                 const badge = document.createElement('span');
                 badge.style.backgroundColor = '#e0e7ff';
                 badge.style.color = '#4338ca';
@@ -94,19 +97,12 @@
         }
 
         // Subtotal calculations
-        const discountMultiplier = 1 - ((booking.discount || 0) / 100);
-        const roomSubtotal = (booking.room_price * discountMultiplier) * booking.total_nights;
-        
-        let extraSubtotal = 0;
-        if (booking.extra_facilities && Array.isArray(booking.extra_facilities)) {
-            booking.extra_facilities.forEach(ef => {
-                extraSubtotal += parseFloat(ef.price || 0);
-            });
-        }
+        const roomSubtotal = parseFloat(booking.total_price || 0) - extraSubtotal;
 
-        document.getElementById('preview_room_subtotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(roomSubtotal);
+        document.getElementById('preview_room_subtotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(roomSubtotal > 0 ? roomSubtotal : 0);
         document.getElementById('preview_extra_subtotal').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(extraSubtotal);
-        document.getElementById('preview_discount_percent').innerText = booking.discount && booking.discount > 0 ? `${booking.discount}% OFF` : 'Tidak Ada';
+        document.getElementById('preview_discount_percent').innerText = (booking.discount && booking.discount > 0) ? `${booking.discount}% OFF` : 'Tidak Ada';
+        document.getElementById('preview_admin_discount_percent').innerText = (booking.admin_discount && booking.admin_discount > 0) ? `${booking.admin_discount}% OFF` : 'Tidak Ada';
         document.getElementById('preview_total_price').innerText = 'Rp ' + new Intl.NumberFormat('id-ID').format(booking.total_price);
 
         // Render Status Badge

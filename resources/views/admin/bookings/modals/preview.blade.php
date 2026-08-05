@@ -86,10 +86,14 @@
                 <div style="font-size: 0.95rem; font-weight: 700; color: #4338ca; margin-top: 0.15rem;" id="preview_extra_subtotal">Rp 0</div>
             </div>
             <div>
-                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">DISKON KAMAR (%)</div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">DISKON KAMAR BISA</div>
                 <div style="font-size: 0.95rem; font-weight: 700; color: #dc2626; margin-top: 0.15rem;" id="preview_discount_percent">Tidak Ada</div>
             </div>
             <div>
+                <div style="font-size: 0.72rem; color: #64748b; font-weight: 600; text-transform: uppercase;">DISKON KHUSUS ADMIN</div>
+                <div style="font-size: 0.95rem; font-weight: 700; color: #ea580c; margin-top: 0.15rem;" id="preview_admin_discount_percent">Tidak Ada</div>
+            </div>
+            <div style="grid-column: span 2;">
                 <div style="font-size: 0.72rem; color: #15803d; font-weight: 700; text-transform: uppercase;">TOTAL KESELURUHAN BIAYA</div>
                 <div style="font-size: 1.1rem; font-weight: 800; color: #16a34a; margin-top: 0.15rem;" id="preview_total_price">Rp 0</div>
             </div>

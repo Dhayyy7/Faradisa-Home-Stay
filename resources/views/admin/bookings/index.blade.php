@@ -391,32 +391,59 @@
                     </td>
                     <td>
                         @php
-                            $discountMultiplier = 1 - (($b->discount ?? 0) / 100);
-                            $roomSubtotal = ($b->room_price * $discountMultiplier) * $b->total_nights;
-                            
                             $extraTotal = 0;
                             if (is_array($b->extra_facilities)) {
                                 foreach ($b->extra_facilities as $ef) {
                                     $extraTotal += $ef['price'] ?? 0;
                                 }
                             }
+                            
+                            $details = $b->room ? $b->room->calculateBookingDetails($b->check_in_date, $b->check_out_date) : null;
+                            $weekdayNights = $details['weekday_nights'] ?? $b->total_nights;
+                            $weekendNights = $details['weekend_nights'] ?? 0;
+
+                            $effectiveDiscount = ($b->admin_discount && $b->admin_discount > 0) ? $b->admin_discount : ($b->discount ?? 0);
+                            $multiplier = 1 - ($effectiveDiscount / 100);
+
+                            $baseWeekday = $b->room ? $b->room->price : $b->room_price;
+                            $baseWeekend = ($b->room && $b->room->weekend_price > 0) ? $b->room->weekend_price : $baseWeekday;
+
+                            $weekdaySubtotal = ($baseWeekday * $multiplier) * $weekdayNights;
+                            $weekendSubtotal = ($baseWeekend * $multiplier) * $weekendNights;
+
+                            $hasBoth = ($weekdayNights > 0 && $weekendNights > 0);
                         @endphp
 
-                        <div style="font-size: 0.78rem; color: #475569;">
-                            Kamar: <strong>Rp {{ number_format($roomSubtotal, 0, ',', '.') }}</strong>
-                        </div>
+                        @if($hasBoth)
+                            <div style="font-size: 0.75rem; color: #475569;">
+                                Weekday: <strong>Rp {{ number_format($weekdaySubtotal, 0, ',', '.') }}</strong> ({{ $weekdayNights }} m)
+                            </div>
+                            <div style="font-size: 0.75rem; color: #475569;">
+                                Weekend: <strong>Rp {{ number_format($weekendSubtotal, 0, ',', '.') }}</strong> ({{ $weekendNights }} m)
+                            </div>
+                        @elseif($weekendNights > 0)
+                            <div style="font-size: 0.78rem; color: #475569;">
+                                Kamar Weekend: <strong>Rp {{ number_format($weekendSubtotal, 0, ',', '.') }}</strong> ({{ $weekendNights }} m)
+                            </div>
+                        @else
+                            <div style="font-size: 0.78rem; color: #475569;">
+                                Kamar Weekday: <strong>Rp {{ number_format($weekdaySubtotal, 0, ',', '.') }}</strong> ({{ $weekdayNights }} m)
+                            </div>
+                        @endif
 
                         @if($extraTotal > 0)
-                        <div style="font-size: 0.78rem; color: #4338ca;">
+                        <div style="font-size: 0.78rem; color: #4338ca; margin-top: 0.1rem;">
                             Extra: <strong>+Rp {{ number_format($extraTotal, 0, ',', '.') }}</strong>
                         </div>
                         @endif
 
-                        <div style="font-weight: 800; color: #16a34a; font-size: 0.95rem; margin-top: 0.15rem;">
+                        <div style="font-weight: 800; color: #16a34a; font-size: 0.95rem; margin-top: 0.2rem;">
                             Total: Rp {{ number_format($b->total_price, 0, ',', '.') }}
                         </div>
 
-                        @if($b->discount && $b->discount > 0)
+                        @if($b->admin_discount && $b->admin_discount > 0)
+                            <div style="margin-top: 0.1rem;"><span class="badge-discount-percent" style="background-color: #ffedd5; color: #c2410c;">Diskon Admin: {{ number_format($b->admin_discount, 0) }}% OFF</span></div>
+                        @elseif($b->discount && $b->discount > 0)
                             <div style="margin-top: 0.1rem;"><span class="badge-discount-percent">{{ number_format($b->discount, 0) }}% OFF</span></div>
                         @endif
                     </td>

@@ -37,55 +37,55 @@
     <table>
         <!-- Header Homestay -->
         <tr>
-            <td colspan="12" class="title-header" style="height: 30px;">{{ strtoupper($setting->homestay_name ?? 'FARADISA HOMESTAY') }}</td>
+            <td colspan="13" class="title-header" style="height: 30px;">{{ strtoupper($setting->homestay_name ?? 'FARADISA HOMESTAY') }}</td>
         </tr>
         <tr>
-            <td colspan="12" class="subtitle-header">LAPORAN BULANAN PEMESANAN HOMESTAY</td>
+            <td colspan="13" class="subtitle-header">LAPORAN BULANAN PEMESANAN HOMESTAY</td>
         </tr>
         <tr>
-            <td colspan="12" class="subtitle-header">Periode: <b>{{ strtoupper($monthName) }} {{ $year }}</b></td>
+            <td colspan="13" class="subtitle-header">Periode: <b>{{ strtoupper($monthName) }} {{ $year }}</b></td>
         </tr>
         <tr>
-            <td colspan="12" class="subtitle-header">Tanggal Export: {{ date('d/m/Y H:i') }} WIB</td>
+            <td colspan="13" class="subtitle-header">Tanggal Export: {{ date('d/m/Y H:i') }} WIB</td>
         </tr>
-        <tr><td colspan="12" style="border:none;"></td></tr>
+        <tr><td colspan="13" style="border:none;"></td></tr>
 
         <!-- Ringkasan Eksekutif KPI -->
         <tr>
             <td colspan="4" class="kpi-title">RINGKASAN EKSEKUTIF BULANAN</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2">Total Pesanan</td>
             <td colspan="2" class="kpi-val" style="text-align: right;">{{ $summary['total'] }} Pesanan</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2">Pesanan Lunas / Selesai</td>
             <td colspan="2" class="kpi-val" style="text-align: right; color: #16a34a;">{{ $summary['lunas'] }} Pesanan</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2">DP 50%</td>
             <td colspan="2" class="kpi-val" style="text-align: right; color: #7e22ce;">{{ $summary['dp'] }} Pesanan</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2">Pending WA</td>
             <td colspan="2" class="kpi-val" style="text-align: right; color: #d97706;">{{ $summary['pending'] }} Pesanan</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2">Dibatalkan</td>
             <td colspan="2" class="kpi-val" style="text-align: right; color: #dc2626;">{{ $summary['batal'] }} Pesanan</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
         <tr>
             <td colspan="2" style="background-color: #fef3c7; font-weight: bold;">Total Pendapatan / Omset</td>
             <td colspan="2" class="kpi-val" style="background-color: #fef3c7; text-align: right; color: #b45309;">Rp {{ number_format($summary['revenue'], 0, ',', '.') }}</td>
-            <td colspan="8" style="border:none;"></td>
+            <td colspan="9" style="border:none;"></td>
         </tr>
-        <tr><td colspan="12" style="border:none;"></td></tr>
+        <tr><td colspan="13" style="border:none;"></td></tr>
 
         <!-- Table Data Header -->
         <thead>
@@ -99,6 +99,7 @@
                 <th class="th-main" style="width: 110px;">Check-Out</th>
                 <th class="th-main" style="width: 100px;">Durasi</th>
                 <th class="th-main" style="width: 180px;">Extra Fasilitas</th>
+                <th class="th-main" style="width: 130px;">Diskon Admin (%)</th>
                 <th class="th-main" style="width: 130px;">Total Biaya (Rp)</th>
                 <th class="th-main" style="width: 120px;">Status</th>
                 <th class="th-main" style="width: 140px;">Tanggal Dibuat</th>
@@ -125,6 +126,7 @@
                     <td style="text-align: center;">{{ $b->check_out_date ? $b->check_out_date->format('d/m/Y') : '-' }}</td>
                     <td style="text-align: center;">{{ $b->total_nights }} Malam</td>
                     <td>{{ $extrasStr }}</td>
+                    <td style="text-align: center; font-weight: bold; color: #ea580c;">{{ ($b->admin_discount && $b->admin_discount > 0) ? number_format($b->admin_discount, 0) . '%' : '-' }}</td>
                     <td class="currency" style="text-align: right; font-weight: bold;">Rp {{ number_format($b->total_price, 0, ',', '.') }}</td>
                     @if(in_array($b->status, [2, 3]))
                         <td class="status-lunas">LUNAS</td>
@@ -139,7 +141,7 @@
                 </tr>
             @empty
                 <tr>
-                    <td colspan="12" style="text-align: center; color: #94a3b8; padding: 15px;">
+                    <td colspan="13" style="text-align: center; color: #94a3b8; padding: 15px;">
                         Tidak ada transaksi pemesanan pada bulan {{ $monthName }} {{ $year }}.
                     </td>
                 </tr>
