@@ -66,23 +66,8 @@ class RoomController extends Controller
 
         $imagePaths = [];
         if ($request->hasFile('images')) {
-            $uploadPath = public_path('uploads/rooms');
-            $rootUploadPath = base_path('uploads/rooms');
-
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($uploadPath !== $rootUploadPath && !File::exists($rootUploadPath)) {
-                File::makeDirectory($rootUploadPath, 0755, true);
-            }
-
             foreach ($request->file('images') as $file) {
-                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($uploadPath, $filename);
-                if ($uploadPath !== $rootUploadPath && File::exists($uploadPath . '/' . $filename)) {
-                    File::copy($uploadPath . '/' . $filename, $rootUploadPath . '/' . $filename);
-                }
-                $imagePaths[] = 'uploads/rooms/' . $filename;
+                $imagePaths[] = $this->saveUploadedFile($file, 'rooms');
             }
         }
 
@@ -135,37 +120,15 @@ class RoomController extends Controller
         if ($request->has('deleted_images')) {
             $deletedImages = $request->input('deleted_images', []);
             foreach ($deletedImages as $delPath) {
-                $fullPath = public_path($delPath);
-                if (File::exists($fullPath)) {
-                    File::delete($fullPath);
-                }
-                $rootDelPath = base_path($delPath);
-                if ($fullPath !== $rootDelPath && File::exists($rootDelPath)) {
-                    File::delete($rootDelPath);
-                }
+                $this->deleteUploadedFile($delPath);
                 $imagePaths = array_values(array_filter($imagePaths, fn($p) => $p !== $delPath));
             }
         }
 
         // Process newly uploaded images
         if ($request->hasFile('images')) {
-            $uploadPath = public_path('uploads/rooms');
-            $rootUploadPath = base_path('uploads/rooms');
-
-            if (!File::exists($uploadPath)) {
-                File::makeDirectory($uploadPath, 0755, true);
-            }
-            if ($uploadPath !== $rootUploadPath && !File::exists($rootUploadPath)) {
-                File::makeDirectory($rootUploadPath, 0755, true);
-            }
-
             foreach ($request->file('images') as $file) {
-                $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
-                $file->move($uploadPath, $filename);
-                if ($uploadPath !== $rootUploadPath && File::exists($uploadPath . '/' . $filename)) {
-                    File::copy($uploadPath . '/' . $filename, $rootUploadPath . '/' . $filename);
-                }
-                $imagePaths[] = 'uploads/rooms/' . $filename;
+                $imagePaths[] = $this->saveUploadedFile($file, 'rooms');
             }
         }
 
@@ -195,5 +158,61 @@ class RoomController extends Controller
         $room->delete();
 
         return redirect()->route('admin.rooms.index')->with('success', 'Data kamar berhasil dihapus (Soft Delete)!');
+    }
+
+    /**
+     * Helper to save uploaded file across all potential shared hosting public paths.
+     */
+    private function saveUploadedFile($file, $subfolder)
+    {
+        $filename = time() . '_' . uniqid() . '.' . $file->getClientOriginalExtension();
+        $subfolderClean = trim($subfolder, '/');
+        $relativePath = 'uploads/' . $subfolderClean . '/' . $filename;
+
+        $directories = array_unique([
+            public_path('uploads/' . $subfolderClean),
+            base_path('uploads/' . $subfolderClean),
+            base_path('public_html/uploads/' . $subfolderClean),
+            base_path('public/uploads/' . $subfolderClean),
+        ]);
+
+        $primaryDir = $directories[0];
+        if (!File::exists($primaryDir)) {
+            File::makeDirectory($primaryDir, 0755, true);
+        }
+
+        $file->move($primaryDir, $filename);
+
+        foreach (array_slice($directories, 1) as $targetDir) {
+            if (!File::exists($targetDir)) {
+                File::makeDirectory($targetDir, 0755, true);
+            }
+            $targetFile = $targetDir . '/' . $filename;
+            if (File::exists($primaryDir . '/' . $filename) && !File::exists($targetFile)) {
+                @File::copy($primaryDir . '/' . $filename, $targetFile);
+            }
+        }
+
+        return $relativePath;
+    }
+
+    /**
+     * Helper to delete file across all potential shared hosting public paths.
+     */
+    private function deleteUploadedFile($relativePath)
+    {
+        if (empty($relativePath)) return;
+        $cleanPath = ltrim($relativePath, '/');
+        $paths = array_unique([
+            public_path($cleanPath),
+            base_path($cleanPath),
+            base_path('public_html/' . $cleanPath),
+            base_path('public/' . $cleanPath),
+        ]);
+        foreach ($paths as $p) {
+            if (File::exists($p)) {
+                @File::delete($p);
+            }
+        }
     }
 }
