@@ -492,6 +492,57 @@
             </tbody>
         </table>
     </div>
+
+    <!-- Pagination Footer -->
+    @if($bookings->hasPages())
+    <div style="padding: 1.1rem 1.5rem; border-top: 1px solid #f1f5f9; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; background: #f8fafc; border-bottom-left-radius: 20px; border-bottom-right-radius: 20px;">
+        <div style="font-size: 0.825rem; color: #64748b; font-weight: 600;">
+            Menampilkan <span style="color: #0f172a; font-weight: 700;">{{ $bookings->firstItem() ?? 0 }}</span> - <span style="color: #0f172a; font-weight: 700;">{{ $bookings->lastItem() ?? 0 }}</span> dari <span style="color: #0f172a; font-weight: 700;">{{ $bookings->total() }}</span> data pemesanan
+        </div>
+
+        <div style="display: flex; align-items: center; gap: 0.35rem;">
+            {{-- Previous Page Link --}}
+            @if ($bookings->onFirstPage())
+                <span style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #e2e8f0; color: #94a3b8; font-size: 0.8rem; font-weight: 700; cursor: not-allowed; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 0.7rem;"></i> Prev
+                </span>
+            @else
+                <a href="{{ $bookings->appends(request()->query())->previousPageUrl() }}" style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #ffffff; color: #334155; border: 1px solid #cbd5e1; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s ease;">
+                    <i class="fa-solid fa-chevron-left" style="font-size: 0.7rem;"></i> Prev
+                </a>
+            @endif
+
+            {{-- Page Numbers --}}
+            @foreach ($bookings->getUrlRange(1, $bookings->lastPage()) as $page => $url)
+                @php
+                    $urlWithQuery = $bookings->appends(request()->query())->url($page);
+                @endphp
+                @if ($page == $bookings->currentPage())
+                    <span style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #4f46e5; color: #ffffff; font-size: 0.8rem; font-weight: 800; box-shadow: 0 2px 6px rgba(79, 70, 229, 0.3);">
+                        {{ $page }}
+                    </span>
+                @elseif($page == 1 || $page == $bookings->lastPage() || abs($page - $bookings->currentPage()) <= 2)
+                    <a href="{{ $urlWithQuery }}" style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #ffffff; color: #475569; border: 1px solid #cbd5e1; font-size: 0.8rem; font-weight: 700; text-decoration: none; transition: all 0.2s ease;">
+                        {{ $page }}
+                    </a>
+                @elseif(abs($page - $bookings->currentPage()) == 3)
+                    <span style="padding: 0.45rem 0.5rem; color: #94a3b8; font-size: 0.8rem; font-weight: 700;">...</span>
+                @endif
+            @endforeach
+
+            {{-- Next Page Link --}}
+            @if ($bookings->hasMorePages())
+                <a href="{{ $bookings->appends(request()->query())->nextPageUrl() }}" style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #ffffff; color: #334155; border: 1px solid #cbd5e1; font-size: 0.8rem; font-weight: 700; text-decoration: none; display: inline-flex; align-items: center; gap: 0.35rem; box-shadow: 0 1px 2px rgba(0,0,0,0.05); transition: all 0.2s ease;">
+                    Next <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                </a>
+            @else
+                <span style="padding: 0.45rem 0.85rem; border-radius: 8px; background: #e2e8f0; color: #94a3b8; font-size: 0.8rem; font-weight: 700; cursor: not-allowed; display: inline-flex; align-items: center; gap: 0.35rem;">
+                    Next <i class="fa-solid fa-chevron-right" style="font-size: 0.7rem;"></i>
+                </span>
+            @endif
+        </div>
+    </div>
+    @endif
 </div>
 
 <!-- Modal Partials -->
