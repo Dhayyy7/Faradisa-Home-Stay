@@ -1,20 +1,20 @@
+@php
+    $appSetting = $appSetting ?? \App\Models\Setting::getSetting();
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    @php
-        $appSetting = \App\Models\Setting::getSetting();
-    @endphp
 
     <title>@yield('title', 'Admin Dashboard') - {{ $appSetting->homestay_name ?? 'Faradisa HomeStay' }}</title>
 
     <!-- Favicon Icon Tab Web -->
-    @if($appSetting->logo && file_exists(public_path($appSetting->logo)))
-        <link rel="icon" type="image/x-icon" href="/{{ $appSetting->logo }}">
-        <link rel="shortcut icon" href="/{{ $appSetting->logo }}">
-        <link rel="apple-touch-icon" href="/{{ $appSetting->logo }}">
+    @if(!empty($appSetting->logo) && file_exists(public_path(ltrim($appSetting->logo, '/'))))
+        <link rel="icon" type="image/x-icon" href="/{{ ltrim($appSetting->logo, '/') }}">
+        <link rel="shortcut icon" href="/{{ ltrim($appSetting->logo, '/') }}">
+        <link rel="apple-touch-icon" href="/{{ ltrim($appSetting->logo, '/') }}">
     @endif
 
     <!-- Google Fonts -->
@@ -460,9 +460,9 @@
             $appSetting = \App\Models\Setting::getSetting();
         @endphp
         <div class="sidebar-brand">
-            @if($appSetting->logo && file_exists(public_path($appSetting->logo)))
+            @if(!empty($appSetting->logo) && file_exists(public_path(ltrim($appSetting->logo, '/'))))
                 <div class="sidebar-brand-icon" style="background: #ffffff; padding: 3px; border: 1px solid rgba(255,255,255,0.2);">
-                    <img src="/{{ $appSetting->logo }}" alt="Logo {{ $appSetting->homestay_name }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
+                    <img src="/{{ ltrim($appSetting->logo, '/') }}" alt="Logo {{ $appSetting->homestay_name }}" style="width: 100%; height: 100%; object-fit: contain; border-radius: 6px;">
                 </div>
             @else
                 <div class="sidebar-brand-icon">

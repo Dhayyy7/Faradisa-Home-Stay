@@ -1,3 +1,11 @@
+@php
+    $setting = $setting ?? \App\Models\Setting::getSetting();
+    $rawWa = $setting->wa_number ?? '';
+    $waClean = preg_replace('/[^0-9]/', '', $rawWa);
+    if (str_starts_with($waClean, '0')) {
+        $waClean = '62' . substr($waClean, 1);
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,9 +15,9 @@
     <meta name="description" content="Nikmati pengalaman menginap terbaik di {{ $setting->homestay_name ?? 'Faradisa HomeStay' }} dengan fasilitas lengkap, bersih, dan pelayanan ramah.">
     
     <!-- Dynamic Favicon -->
-    @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-        <link rel="icon" type="image/png" href="/{{ $setting->logo }}">
-        <link rel="shortcut icon" type="image/png" href="/{{ $setting->logo }}">
+    @if(!empty($setting->logo) && file_exists(public_path(ltrim($setting->logo, '/'))))
+        <link rel="icon" type="image/png" href="/{{ ltrim($setting->logo, '/') }}">
+        <link rel="shortcut icon" type="image/png" href="/{{ ltrim($setting->logo, '/') }}">
     @else
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
     @endif
@@ -26,14 +34,6 @@
     <!-- Custom Landing JavaScript -->
     <script src="/js/landing.js" defer></script>
 </head>
-@php
-    $setting = $setting ?? \App\Models\Setting::getSetting();
-    $rawWa = $setting->wa_number ?? '082232761695';
-    $waClean = preg_replace('/[^0-9]/', '', $rawWa);
-    if (str_starts_with($waClean, '0')) {
-        $waClean = '62' . substr($waClean, 1);
-    }
-@endphp
 <body>
 
     <!-- ==========================================
@@ -43,8 +43,8 @@
         <div class="nav-container">
             <!-- Brand Logo & Name -->
             <a href="{{ route('home') }}" class="nav-brand">
-                @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-                    <img src="/{{ $setting->logo }}" alt="Logo {{ $setting->homestay_name }}" class="nav-logo-img">
+                @if(!empty($setting->logo) && file_exists(public_path(ltrim($setting->logo, '/'))))
+                    <img src="/{{ ltrim($setting->logo, '/') }}" alt="Logo {{ $setting->homestay_name }}" class="nav-logo-img">
                 @else
                     <div style="width: 42px; height: 42px; border-radius: 12px; background: linear-gradient(135deg, #c2410c, #f97316); display: flex; align-items: center; justify-content: center; color: white; font-weight: 800;">
                         <i class="fa-solid fa-house-chimney"></i>
@@ -348,18 +348,38 @@
 
                         <!-- Card Footer Pricing & Actions -->
                         <div class="room-footer">
-                            <div class="price-box">
+                            <div class="price-box" style="min-height: 76px; display: flex; flex-direction: column; justify-content: flex-end;">
                                 @if($room->discount && $room->discount > 0)
-                                    <div class="price-strike">
-                                        Rp {{ number_format($room->price, 0, ',', '.') }}
+                                    <div style="display: flex; align-items: center; gap: 0.4rem; margin-bottom: 0.15rem;">
+                                        <span class="price-strike" style="font-size: 0.8rem; color: #94a3b8; text-decoration: line-through;">
+                                            Rp {{ number_format($room->price, 0, ',', '.') }}
+                                        </span>
+                                        <span style="background-color: #fee2e2; color: #dc2626; font-size: 0.68rem; font-weight: 700; padding: 0.1rem 0.4rem; border-radius: 4px;">
+                                            Diskon {{ number_format($room->discount, 0) }}%
+                                        </span>
                                     </div>
                                 @endif
-                                <div style="display: flex; align-items: baseline; gap: 0.25rem;">
-                                    <span class="price-final">
+
+                                <div style="display: flex; align-items: baseline; gap: 0.35rem; flex-wrap: wrap;">
+                                    <span class="price-final" style="font-size: 0.9rem; font-weight: 500; color: #c2410c;">Harga mulai</span>
+                                </div>
+                                <div style="display: flex; align-items: baseline; gap: 0.35rem; flex-wrap: wrap;">
+                                    <span class="price-final" style="font-size: 1.5rem; font-weight: 800; color: #c2410c;">
                                         Rp {{ number_format($room->final_price, 0, ',', '.') }}
                                     </span>
-                                    <span class="price-unit">/ malam</span>
+                                    <span class="price-unit" style="font-size: 0.8rem; color: #64748b; font-weight: 600;">/ malam</span>
                                 </div>
+
+                                @if($room->weekend_price && $room->weekend_price > 0)
+                                    <div style="font-size: 0.75rem; color: #64748b; opacity: 0.8; margin-top: 0.25rem; font-weight: 500; display: flex; align-items: center; gap: 0.35rem;">
+                                        <i class="fa-solid fa-calendar-week" style="font-size: 0.7rem; color: #f97316;"></i>
+                                        <span>Harga weekend <strong style="color: #334155;">Rp {{ number_format($room->final_weekend_price, 0, ',', '.') }}</strong> / malam</span>
+                                    </div>
+                                @else
+                                    <div style="font-size: 0.75rem; color: transparent; margin-top: 0.25rem; font-weight: 500; user-select: none;">
+                                        &nbsp;
+                                    </div>
+                                @endif
                             </div>
 
                             <a href="{{ route('booking', $room->id) }}" class="btn-book-now" style="width: 100%; padding: 0.9rem; border-radius: 12px; background-color: var(--primary, #c2410c); color: #ffffff; font-size: 0.85rem; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; text-decoration: none; border: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; gap: 0.6rem; box-shadow: 0 4px 15px rgba(194, 65, 12, 0.3); transition: all 0.25s ease;">

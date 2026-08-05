@@ -1,3 +1,16 @@
+@php
+    $setting = $setting ?? \App\Models\Setting::getSetting();
+    $rawWa = $setting->wa_number ?? '';
+    $waClean = preg_replace('/[^0-9]/', '', $rawWa);
+    if (str_starts_with($waClean, '0')) {
+        $waClean = '62' . substr($waClean, 1);
+    }
+    $calMonth = sprintf('%02d', (int) ($calMonth ?? date('m')));
+    $calYear = (int) ($calYear ?? date('Y'));
+    $firstDay = \Carbon\Carbon::createFromDate((int)$calYear, (int)$calMonth, 1);
+    $daysInMonth = $firstDay->daysInMonth;
+    $startOffset = $firstDay->dayOfWeekIso - 1; // 1 = Monday (0 offset), 7 = Sunday (6 offset)
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -7,32 +20,11 @@
     <meta name="description" content="Kalender ketersediaan kamar real-time di {{ $setting->homestay_name ?? 'Faradisa HomeStay' }}. Cek tanggal bebas dan pesan kamar favorit Anda.">
     
     <!-- Dynamic Favicon -->
-    @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-        <link rel="icon" type="image/png" href="/{{ $setting->logo }}">
+    @if(!empty($setting->logo) && file_exists(public_path(ltrim($setting->logo, '/'))))
+        <link rel="icon" type="image/png" href="/{{ ltrim($setting->logo, '/') }}">
     @else
         <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
     @endif
-
-    <!-- FontAwesome 6 Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- SweetAlert2 -->
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-
-    @php
-        $setting = $setting ?? \App\Models\Setting::getSetting();
-        $rawWa = $setting->wa_number ?? '082232761695';
-        $waClean = preg_replace('/[^0-9]/', '', $rawWa);
-        if (str_starts_with($waClean, '0')) {
-            $waClean = '62' . substr($waClean, 1);
-        }
-
-        $calMonth = sprintf('%02d', (int) ($calMonth ?? date('m')));
-        $calYear = (int) ($calYear ?? date('Y'));
-        $firstDay = \Carbon\Carbon::createFromDate((int)$calYear, (int)$calMonth, 1);
-        $daysInMonth = $firstDay->daysInMonth;
-        $startOffset = $firstDay->dayOfWeekIso - 1; // 1 = Monday (0 offset), 7 = Sunday (6 offset)
-    @endphp
 
     <style>
         :root {
@@ -337,8 +329,8 @@
                 <span>Beranda</span>
             </a>
             <a href="{{ route('home') }}" class="brand-logo-text">
-                @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-                    <img src="/{{ $setting->logo }}" alt="Logo {{ $setting->homestay_name }}" class="brand-logo-img">
+                @if(!empty($setting->logo) && file_exists(public_path(ltrim($setting->logo, '/'))))
+                    <img src="/{{ ltrim($setting->logo, '/') }}" alt="Logo {{ $setting->homestay_name }}" class="brand-logo-img">
                 @endif
                 <span>{{ $setting->homestay_name ?? 'Faradisa HomeStay' }}</span>
             </a>

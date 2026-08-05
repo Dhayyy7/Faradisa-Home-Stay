@@ -1,3 +1,21 @@
+@php
+    $setting = $setting ?? \App\Models\Setting::getSetting();
+    $rawWa = $setting->wa_number ?? '';
+    $waClean = preg_replace('/[^0-9]/', '', $rawWa);
+    if (str_starts_with($waClean, '0')) {
+        $waClean = '62' . substr($waClean, 1);
+    }
+    $rawImgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
+    $imgs = [];
+    foreach($rawImgs as $im) {
+        if (!empty($im)) {
+            $imgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
+        }
+    }
+    if (count($imgs) === 0) {
+        $imgs = ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'];
+    }
+@endphp
 <!DOCTYPE html>
 <html lang="id">
 <head>
@@ -6,13 +24,6 @@
     <title>{{ $room->name }} - {{ $setting->homestay_name ?? 'Faradisa HomeStay' }}</title>
     <meta name="description" content="Detail dan reservasi {{ $room->name }} di {{ $setting->homestay_name ?? 'Faradisa HomeStay' }}.">
     
-    <!-- Dynamic Favicon -->
-    @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-        <link rel="icon" type="image/png" href="/{{ $setting->logo }}">
-    @else
-        <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🏠</text></svg>">
-    @endif
-
     <!-- FontAwesome 6 Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
@@ -22,27 +33,26 @@
     <!-- Custom Landing Stylesheet -->
     <link rel="stylesheet" href="/css/landing.css">
 
-    @php
-        $setting = $setting ?? \App\Models\Setting::getSetting();
-        $rawWa = $setting->wa_number ?? '082232761695';
-        $waClean = preg_replace('/[^0-9]/', '', $rawWa);
-        if (str_starts_with($waClean, '0')) {
-            $waClean = '62' . substr($waClean, 1);
-        }
-        $rawImgs = is_array($room->images) ? array_values(array_filter($room->images)) : [];
-        $imgs = [];
-        foreach($rawImgs as $im) {
-            if (!empty($im)) {
-                $imgs[] = str_starts_with($im, 'http') ? $im : ('/' . ltrim($im, '/'));
-            }
-        }
-        if (count($imgs) === 0) {
-            $imgs = ['https://images.unsplash.com/photo-1582719478250-c89cae4dc85b?auto=format&fit=crop&w=1200&q=80'];
-        }
-    @endphp
-
     <style>
         :root {
+            --primary: #c2410c;
+            --primary-hover: #9a3412;
+            --primary-light: #ffedd5;
+            --brand-amber: #f97316;
+            --emerald-green: #10b981;
+            --emerald-dark: #059669;
+            --dark-slate: #0f172a;
+            --dark-slate-hover: #1e293b;
+            --gold-soft: #fde047;
+            --card-bg: #ffffff;
+            --bg-soft: #f8fafc;
+            --text-slate-900: #0f172a;
+            --text-slate-800: #1e293b;
+            --text-slate-600: #475569;
+            --text-slate-500: #64748b;
+            --text-slate-400: #94a3b8;
+            --border-color: #e2e8f0;
+
             --nusakos-bg: #f7f4ef;
             --nusakos-card-bg: #ffffff;
             --nusakos-brown: #8c7355;
@@ -640,8 +650,8 @@
                 <span>Kembali</span>
             </a>
             <a href="{{ route('home') }}" class="brand-logo-text">
-                @if(isset($setting->logo) && file_exists(public_path($setting->logo)))
-                    <img src="/{{ $setting->logo }}" alt="Logo" style="height: 28px; width: auto;">
+                @if(!empty($setting->logo) && file_exists(public_path(ltrim($setting->logo, '/'))))
+                    <img src="/{{ ltrim($setting->logo, '/') }}" alt="Logo" style="height: 28px; width: auto;">
                 @else
                     <i class="fa-solid fa-house-chimney" style="color: var(--nusakos-brown);"></i>
                 @endif
@@ -929,7 +939,7 @@
                 @endif
 
                 <!-- Dynamic Pricing Summary Breakdown -->
-                <div style="background: var(--dark-slate); color: white; padding: 1.35rem; border-radius: 18px; margin-top: 1.25rem;">
+                <div style="background: #0f172a; color: #ffffff; padding: 1.35rem; border-radius: 18px; margin-top: 1.25rem;">
                     <div style="display: flex; justify-content: space-between; font-size: 0.75rem; margin-bottom: 0.35rem; color: rgba(255,255,255,0.75);">
                         <span>Harga Kamar per Malam:</span>
                         <strong style="color: white;">Rp {{ number_format($room->final_price, 0, ',', '.') }}</strong>
