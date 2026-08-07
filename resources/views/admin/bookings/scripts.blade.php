@@ -125,4 +125,16 @@
     function closePreviewModal() {
         document.getElementById('previewModal').classList.remove('show');
     }
+
+    $(document).ready(function() {
+        if ($('#status_filter').length) {
+            $('#status_filter').select2({
+                placeholder: '-- Semua Status --',
+                allowClear: true,
+                minimumResultsForSearch: Infinity
+            }).on('change', function() {
+                $('#booking-filter-form').submit();
+            });
+        }
+    });
 </script>

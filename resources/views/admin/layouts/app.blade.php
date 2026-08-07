@@ -25,7 +25,69 @@
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
+    <!-- jQuery & Select2 CDN -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/css/select2.min.css" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/select2@4.1.0-rc.0/dist/js/select2.min.js"></script>
+
     <style>
+        /* Select2 Custom Styles */
+        .select2-container--default .select2-selection--single {
+            height: 38px !important;
+            border-radius: 10px !important;
+            border: 1px solid #cbd5e1 !important;
+            padding: 3px 6px !important;
+            display: flex !important;
+            align-items: center !important;
+            font-size: 0.825rem !important;
+            background-color: #ffffff !important;
+            transition: all 0.2s ease !important;
+        }
+
+        .select2-container--default .select2-selection--single:focus,
+        .select2-container--default.select2-container--open .select2-selection--single {
+            border-color: #4f46e5 !important;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15) !important;
+            outline: none !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__rendered {
+            color: #1e293b !important;
+            padding-left: 6px !important;
+            padding-right: 20px !important;
+            line-height: 36px !important;
+        }
+
+        .select2-container--default .select2-selection--single .select2-selection__arrow {
+            height: 36px !important;
+            right: 8px !important;
+        }
+
+        .select2-dropdown {
+            border-radius: 10px !important;
+            border: 1px solid #cbd5e1 !important;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.05) !important;
+            font-size: 0.825rem !important;
+            overflow: hidden !important;
+            z-index: 9999 !important;
+        }
+
+        .select2-results__option {
+            padding: 8px 12px !important;
+            font-size: 0.825rem !important;
+        }
+
+        .select2-container--default .select2-results__option--highlighted[aria-selected] {
+            background-color: #4f46e5 !important;
+            color: #ffffff !important;
+        }
+
+        .select2-container--default .select2-results__option[aria-selected=true] {
+            background-color: #e0e7ff !important;
+            color: #4338ca !important;
+            font-weight: 600 !important;
+        }
+
         :root {
             --primary: #4f46e5;
             --primary-light: #6366f1;

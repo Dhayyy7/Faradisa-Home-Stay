@@ -35,8 +35,13 @@ class BookingController extends Controller
         $this->autoUpdateBookingStatuses();
 
         $search = $request->input('search', $request->input('code'));
+        $status = $request->input('status');
 
         $query = Booking::with('room')->latest();
+
+        if ($status !== null && $status !== '') {
+            $query->where('status', $status);
+        }
 
         if ($search) {
             $query->where(function ($q) use ($search) {
@@ -65,11 +70,11 @@ class BookingController extends Controller
             });
         }
 
-        $bookings = $query->paginate(10);
+        $bookings = $query->paginate(10)->withQueryString();
         $rooms = Room::all();
         $extraFacilities = ExtraFacility::all();
 
-        return view('admin.bookings.index', compact('bookings', 'rooms', 'extraFacilities', 'search'));
+        return view('admin.bookings.index', compact('bookings', 'rooms', 'extraFacilities', 'search', 'status'));
     }
 
     /**

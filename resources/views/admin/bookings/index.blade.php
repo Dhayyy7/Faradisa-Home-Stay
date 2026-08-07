@@ -317,20 +317,34 @@
         </h2>
 
         <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
-            <!-- Search Form -->
-            <form action="{{ route('admin.bookings.index') }}" method="GET" style="display: flex; align-items: center; gap: 0.4rem;">
+            <!-- Filter & Search Form -->
+            <form action="{{ route('admin.bookings.index') }}" method="GET" id="booking-filter-form" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                <!-- Status Filter (Select2) -->
+                <div style="width: 180px;">
+                    <select name="status" id="status_filter" class="form-select select2-status" style="width: 100%;">
+                        <option value="">-- Semua Status --</option>
+                        <option value="1" {{ request('status') === '1' ? 'selected' : '' }}>Pending (WA)</option>
+                        <option value="4" {{ request('status') === '4' ? 'selected' : '' }}>DP 50%</option>
+                        <option value="2" {{ request('status') === '2' ? 'selected' : '' }}>Lunas</option>
+                        <option value="3" {{ request('status') === '3' ? 'selected' : '' }}>Selesai</option>
+                        <option value="0" {{ request('status') === '0' ? 'selected' : '' }}>Dibatalkan</option>
+                    </select>
+                </div>
+
+                <!-- Search Input -->
                 <div style="position: relative; display: flex; align-items: center;">
-                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; color: #94a3b8; font-size: 0.8rem;"></i>
-                    <input type="text" name="search" class="form-input" placeholder="Cari kode, nama, hp, status..." value="{{ request('search', request('code')) }}" style="padding-left: 2.1rem; padding-right: 2rem; border-radius: 10px; width: 250px; font-size: 0.825rem; height: 38px;">
-                    @if(request('search') || request('code'))
-                        <a href="{{ route('admin.bookings.index') }}" style="position: absolute; right: 0.65rem; color: #94a3b8; text-decoration: none; font-size: 0.8rem;" title="Reset Pencarian">
+                    <i class="fa-solid fa-magnifying-glass" style="position: absolute; left: 0.75rem; color: #94a3b8; font-size: 0.8rem; z-index: 1;"></i>
+                    <input type="text" name="search" class="form-input" placeholder="Cari kode, nama, hp..." value="{{ request('search', request('code')) }}" style="padding-left: 2.1rem; padding-right: 2rem; border-radius: 10px; width: 200px; font-size: 0.825rem; height: 38px;">
+                    @if(request('search') || request('code') || (request()->has('status') && request('status') !== null && request('status') !== ''))
+                        <a href="{{ route('admin.bookings.index') }}" style="position: absolute; right: 0.65rem; color: #94a3b8; text-decoration: none; font-size: 0.8rem; z-index: 1;" title="Reset Filter">
                             <i class="fa-solid fa-circle-xmark"></i>
                         </a>
                     @endif
                 </div>
+
                 <button type="submit" class="btn-submit" style="padding: 0 0.85rem; height: 38px; border-radius: 10px; background-color: #4f46e5; font-size: 0.825rem;">
-                    <i class="fa-solid fa-magnifying-glass"></i>
-                    <span>Cari</span>
+                    <i class="fa-solid fa-filter"></i>
+                    <span>Filter</span>
                 </button>
             </form>
 
